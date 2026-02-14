@@ -353,6 +353,162 @@ body::after {
     line-height: 1.4;
 }
 
+.hidden {
+    display: none !important;
+}
+
+.tool-no-video {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Panel de herramientas - Estilo tecnológico You-Space */
+.tools-panel {
+    display: none;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.tools-panel.active {
+    display: block;
+}
+
+.tools-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.tools-panel-title {
+    color: var(--accent-cyan);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.tools-back-btn {
+    padding: 0.6rem 1.2rem;
+    background: rgba(0, 194, 255, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.tools-back-btn:hover {
+    background: rgba(0, 194, 255, 0.3);
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+.tools-table-wrapper {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(0, 194, 255, 0.1);
+}
+
+.tools-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tools-table th,
+.tools-table td {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 194, 255, 0.15);
+}
+
+.tools-table th {
+    background: rgba(0, 194, 255, 0.1);
+    color: var(--accent-cyan);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.tools-table td {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.tools-table tbody tr:hover {
+    background: rgba(0, 194, 255, 0.05);
+}
+
+.tools-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.tool-btn-visitar {
+    background: linear-gradient(135deg, rgba(0, 194, 255, 0.8), rgba(0, 150, 200, 0.8));
+    color: #0A0A2A;
+}
+
+.tool-btn-visitar:hover {
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+.tool-btn-video {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+.tool-btn-video:hover {
+    background: rgba(0, 194, 255, 0.2);
+}
+
+.tool-btn-edit {
+    background: rgba(0, 194, 255, 0.2);
+    color: var(--accent-cyan);
+    padding: 0.4rem 0.8rem;
+}
+
+.tool-btn-delete {
+    background: rgba(232, 17, 35, 0.3);
+    color: #ff6b6b;
+    padding: 0.4rem 0.8rem;
+}
+
+.tool-btn-edit:hover,
+.tool-btn-delete:hover {
+    opacity: 0.9;
+}
+
+.tool-actions {
+    display: flex;
+    gap: 8px;
+}
+
+@media (max-width: 900px) {
+    .tools-table-wrapper {
+        overflow-x: auto;
+    }
+    
+    .tools-table {
+        min-width: 800px;
+    }
+}
+
 /* Modal Próximamente */
 .modal-overlay {
     position: fixed;

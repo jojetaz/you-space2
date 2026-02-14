@@ -42,9 +42,8 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
     <main class="main-content">
-        <section class="hero">
+        <section class="hero" id="hero-section">
             <h1 class="hero-title">
                 Tu Espacio de Herramientas <span class="hero-accent">Tecnológicas e IA</span>
             </h1>
@@ -54,8 +53,7 @@
             <button class="cta-button">Explorar Ahora &gt;</button>
         </section>
 
-        <!-- Grid de tarjetas -->
-        <section class="cards-grid">
+        <section class="cards-grid" id="cards-section">
             <a href="#" class="card" data-category="Generación de Video e IA">
                 <div class="card-icon">
                     <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -200,6 +198,31 @@
                 </div>
                 <span class="card-title">Recursos de IA</span>
             </a>
+        </section>
+
+        <!-- Panel de herramientas guardadas -->
+        <section class="tools-panel" id="tools-panel">
+            <div class="tools-panel-header">
+                <h2 class="tools-panel-title">Herramientas guardadas</h2>
+                <button class="tools-back-btn" id="tools-back">← Volver</button>
+            </div>
+            <div class="tools-table-wrapper">
+                <table class="tools-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>URL</th>
+                            <th>Video</th>
+                            <th>Fecha de Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tools-tbody">
+                        <!-- Se cargan desde localStorage/script -->
+                    </tbody>
+                </table>
+            </div>
         </section>
     </main>
 
