@@ -1,0 +1,105 @@
+/* Tema de macOS */
+
+/* Colores principales */
+:root {
+    --desktop-bg: #2d7eff;
+    --window-header-bg: #e4e4e4;
+    --window-header-text: #333;
+    --window-bg: #f5f5f5;
+    --taskbar-bg: rgba(50, 50, 50, 0.8);
+    --taskbar-text: white;
+    --start-button-bg: #2d7eff;
+    --start-button-text: white;
+    --start-menu-bg: rgba(50, 50, 50, 0.9);
+    --start-menu-text: white;
+    --icon-text: white;
+    --icon-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Estilos especu00edficos de macOS */
+.desktop {
+    background-color: var(--desktop-bg);
+}
+
+.window {
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.window-header {
+    background-color: var(--window-header-bg);
+    color: var(--window-header-text);
+    border-bottom: 1px solid #ddd;
+}
+
+.window-controls {
+    display: flex;
+    order: -1;
+    margin-right: 10px;
+}
+
+.window-controls span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    margin-left: 0;
+    font-size: 0;
+}
+
+.window-controls .close {
+    background-color: #ff5f57;
+}
+
+.window-controls .minimize {
+    background-color: #ffbd2e;
+}
+
+.window-controls .maximize {
+    background-color: #28c940;
+}
+
+.window-controls span:hover {
+    filter: brightness(0.9);
+}
+
+.taskbar {
+    background-color: var(--taskbar-bg);
+    height: 50px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.start-button {
+    background-color: transparent;
+    color: var(--taskbar-text);
+    font-weight: normal;
+}
+
+.start-menu-content {
+    background-color: var(--start-menu-bg);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: none;
+    overflow: hidden;
+}
+
+.start-menu-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.calc-btn {
+    border-radius: 20px;
+}
+
+.equals {
+    background-color: #2d7eff;
+}
+
+/* Fuente especu00edfica de macOS */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}

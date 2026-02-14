@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: you-space
+    runtime: static
+    buildCommand: "true"
+    staticPublishPath: .
