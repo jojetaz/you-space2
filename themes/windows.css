@@ -1,62 +1,9 @@
-/* Tema de Windows */
-
-/* Colores principales */
+/* Tema You-Space (Windows) */
 :root {
-    --desktop-bg: #0078d7;
-    --window-header-bg: #0078d7;
-    --window-header-text: white;
-    --window-bg: #f0f0f0;
-    --taskbar-bg: #202020;
-    --taskbar-text: white;
-    --start-button-bg: #0078d7;
-    --start-button-text: white;
-    --start-menu-bg: #202020;
-    --start-menu-text: white;
-    --icon-text: white;
-    --icon-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-/* Estilos específicos de Windows */
-.desktop {
-    background-color: var(--desktop-bg);
-}
-
-.window-header {
-    background-color: var(--window-header-bg);
-    color: var(--window-header-text);
-}
-
-.taskbar {
-    background-color: var(--taskbar-bg);
-}
-
-.start-button {
-    background-color: var(--start-button-bg);
-    color: var(--start-button-text);
-}
-
-.start-menu-content {
-    background-color: var(--start-menu-bg);
-}
-
-.start-menu-header {
-    background-color: var(--window-header-bg);
-}
-
-.window {
-    border-radius: 0;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.window-controls span {
-    border-radius: 0;
-}
-
-.equals {
-    background-color: var(--window-header-bg);
-}
-
-/* Fuente específica de Windows */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --desktop-bg: #0A0A2A;
+    --window-header-bg: rgba(0, 194, 255, 0.2);
+    --window-bg: rgba(15, 15, 45, 0.95);
+    --taskbar-bg: rgba(10, 10, 42, 0.95);
+    --start-button-bg: #00C2FF;
+    --start-menu-bg: rgba(10, 10, 42, 0.98);
 }

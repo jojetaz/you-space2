@@ -3,212 +3,387 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>You-Space - Tu Espacio de Herramientas Tecnológicas e IA</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>You-Space - Tu Espacio de Herramientas</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="themes/windows.css" id="theme-stylesheet">
 </head>
 <body>
-    <!-- Barra de navegación -->
-    <header class="header">
-        <a href="#" class="logo">
-            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 4L12 20M4 12L20 12M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span class="logo-text"><span class="logo-you">You-</span><span class="logo-space">Space</span></span>
-        </a>
-        <nav class="nav-links">
-            <a href="#" data-nav="inicio">Inicio</a>
-            <a href="#" data-nav="herramientas">Herramientas</a>
-            <a href="#" data-nav="cursos">Cursos</a>
-            <a href="#" data-nav="ofertas">Ofertas</a>
-            <a href="#" data-nav="comunidad">Comunidad</a>
-            <a href="#" data-nav="contacto">Contacto</a>
-        </nav>
-        <div class="header-actions">
-            <button class="search-btn" aria-label="Buscar">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                    <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </button>
-            <div class="theme-toggle">
-                <span class="theme-icon">🌙</span>
-                <div class="toggle-switch">
-                    <div class="toggle-knob active"></div>
+    <div class="desktop">
+        <div class="desktop-icons">
+            <div class="icon" data-window="file-explorer">
+                <img src="icons/folder.png" alt="Archivos">
+                <span>Archivos</span>
+            </div>
+            <div class="icon" data-window="browser">
+                <img src="icons/browser.png" alt="Navegador">
+                <span>Navegador</span>
+            </div>
+            <div class="icon" data-window="notepad">
+                <img src="icons/notepad.png" alt="Bloc de notas">
+                <span>Bloc de notas</span>
+            </div>
+            <div class="icon" data-window="calculator">
+                <img src="icons/calculator.png" alt="Calculadora">
+                <span>Calculadora</span>
+            </div>
+            <div class="icon" data-window="settings">
+                <img src="icons/settings.png" alt="Configuración">
+                <span>Configuración</span>
+            </div>
+            <div class="icon" data-window="word">
+                <img src="icons/office/word.png" alt="Word">
+                <span>Word</span>
+            </div>
+            <div class="icon" data-window="excel">
+                <img src="icons/office/excel.png" alt="Excel">
+                <span>Excel</span>
+            </div>
+            <div class="icon" data-window="powerpoint">
+                <img src="icons/office/powerpoint.png" alt="PowerPoint">
+                <span>PowerPoint</span>
+            </div>
+        </div>
+
+        <div class="windows">
+            <div class="window" id="file-explorer">
+                <div class="window-header">
+                    <span class="window-title">Explorador de archivos</span>
+                    <div class="window-controls">
+                        <span class="minimize">_</span>
+                        <span class="maximize">□</span>
+                        <span class="close">×</span>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="sidebar">
+                        <ul>
+                            <li>Escritorio</li>
+                            <li>Documentos</li>
+                            <li>Descargas</li>
+                            <li>Imágenes</li>
+                            <li>Música</li>
+                        </ul>
+                    </div>
+                    <div class="main-content">
+                        <div class="folder-item">
+                            <img src="icons/folder.png" alt="Carpeta">
+                            <span>Documentos</span>
+                        </div>
+                        <div class="folder-item">
+                            <img src="icons/folder.png" alt="Carpeta">
+                            <span>Proyectos</span>
+                        </div>
+                        <div class="folder-item">
+                            <img src="icons/text.png" alt="Archivo">
+                            <span>notas.txt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window" id="browser">
+                <div class="window-header">
+                    <span class="window-title">Navegador Web</span>
+                    <div class="window-controls">
+                        <span class="minimize">_</span>
+                        <span class="maximize">□</span>
+                        <span class="close">×</span>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="browser-toolbar">
+                        <button class="browser-back">←</button>
+                        <button class="browser-forward">→</button>
+                        <button class="browser-refresh">↻</button>
+                        <input type="text" class="browser-address" value="https://www.ejemplo.com">
+                    </div>
+                    <div class="browser-view">
+                        <iframe class="browser-frame" src="about:blank"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window" id="notepad">
+                <div class="window-header">
+                    <span class="window-title">Bloc de notas</span>
+                    <div class="window-controls">
+                        <span class="minimize">_</span>
+                        <span class="maximize">□</span>
+                        <span class="close">×</span>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="notepad-menu">
+                        <span>Archivo</span>
+                        <span>Editar</span>
+                        <span>Formato</span>
+                        <span>Ver</span>
+                        <span>Ayuda</span>
+                    </div>
+                    <textarea class="notepad-area" placeholder="Escribe aquí..."></textarea>
+                </div>
+            </div>
+
+            <div class="window" id="calculator">
+                <div class="window-header">
+                    <span class="window-title">Calculadora</span>
+                    <div class="window-controls">
+                        <span class="minimize">_</span>
+                        <span class="maximize">□</span>
+                        <span class="close">×</span>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="calculator-display">0</div>
+                    <div class="calculator-buttons">
+                        <button class="calc-btn">7</button>
+                        <button class="calc-btn">8</button>
+                        <button class="calc-btn">9</button>
+                        <button class="calc-btn operator">÷</button>
+                        <button class="calc-btn">4</button>
+                        <button class="calc-btn">5</button>
+                        <button class="calc-btn">6</button>
+                        <button class="calc-btn operator">×</button>
+                        <button class="calc-btn">1</button>
+                        <button class="calc-btn">2</button>
+                        <button class="calc-btn">3</button>
+                        <button class="calc-btn operator">-</button>
+                        <button class="calc-btn">0</button>
+                        <button class="calc-btn">.</button>
+                        <button class="calc-btn equals">=</button>
+                        <button class="calc-btn operator">+</button>
+                        <button class="calc-btn clear">C</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window" id="word">
+                <div class="window-header">
+                    <span class="window-title">Word</span>
+                    <div class="window-controls">
+                        <span class="minimize">_</span>
+                        <span class="maximize">□</span>
+                        <span class="close">×</span>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="office-toolbar">
+                        <div class="office-menu">
+                            <span>Archivo</span>
+                            <span>Inicio</span>
+                            <span>Insertar</span>
+                            <span>Diseño</span>
+                            <span>Referencias</span>
+                            <span>Revisar</span>
+                            <span>Vista</span>
+                        </div>
+                        <div class="formatting-toolbar">
+                            <select class="font-family">
+                                <option>Calibri</option>
+                                <option>Arial</option>
+                                <option>Times New Roman</option>
+                            </select>
+                            <select class="font-size">
+                                <option>11</option>
+                                <option>12</option>
+                                <option>14</option>
+                                <option>16</option>
+                            </select>
+                            <button class="format-btn bold">B</button>
+                            <button class="format-btn italic">I</button>
+                            <button class="format-btn underline">U</button>
+                        </div>
+                    </div>
+                    <div class="document-area">
+                        <div class="word-page" contenteditable="true">
+                            <p>Haz clic aquí para comenzar a escribir...</p>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <span>Página 1 de 1</span>
+                        <span>Palabras: 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window" id="excel">
+                <div class="window-header">
+                    <span class="window-title">Excel</span>
+                    <div class="window-controls">
+                        <span class="minimize">_</span>
+                        <span class="maximize">□</span>
+                        <span class="close">×</span>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="office-toolbar">
+                        <div class="office-menu">
+                            <span>Archivo</span>
+                            <span>Inicio</span>
+                            <span>Insertar</span>
+                            <span>Fórmulas</span>
+                            <span>Datos</span>
+                            <span>Vista</span>
+                        </div>
+                    </div>
+                    <div class="excel-container">
+                        <div class="excel-header-row">
+                            <div class="excel-header-cell"></div>
+                            <div class="excel-header-cell">A</div>
+                            <div class="excel-header-cell">B</div>
+                            <div class="excel-header-cell">C</div>
+                            <div class="excel-header-cell">D</div>
+                        </div>
+                        <div class="excel-grid">
+                            <div class="excel-row">
+                                <div class="excel-row-header">1</div>
+                                <div class="excel-cell" contenteditable="true"></div>
+                                <div class="excel-cell" contenteditable="true"></div>
+                                <div class="excel-cell" contenteditable="true"></div>
+                                <div class="excel-cell" contenteditable="true"></div>
+                            </div>
+                            <div class="excel-row">
+                                <div class="excel-row-header">2</div>
+                                <div class="excel-cell" contenteditable="true"></div>
+                                <div class="excel-cell" contenteditable="true"></div>
+                                <div class="excel-cell" contenteditable="true"></div>
+                                <div class="excel-cell" contenteditable="true"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <span>Hoja 1</span>
+                        <span>Celda: A1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window" id="powerpoint">
+                <div class="window-header">
+                    <span class="window-title">PowerPoint</span>
+                    <div class="window-controls">
+                        <span class="minimize">_</span>
+                        <span class="maximize">□</span>
+                        <span class="close">×</span>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="office-toolbar">
+                        <div class="office-menu">
+                            <span>Archivo</span>
+                            <span>Inicio</span>
+                            <span>Insertar</span>
+                            <span>Diseño</span>
+                            <span>Transiciones</span>
+                            <span>Vista</span>
+                        </div>
+                    </div>
+                    <div class="powerpoint-container">
+                        <div class="slide-thumbnails">
+                            <div class="slide-thumbnail active">Diapositiva 1</div>
+                        </div>
+                        <div class="slide-editor">
+                            <div class="slide" contenteditable="true">
+                                <h1>Haz clic para añadir título</h1>
+                                <h3>Haz clic para añadir subtítulo</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <span>Diapositiva 1 de 1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window" id="settings">
+                <div class="window-header">
+                    <span class="window-title">Configuración</span>
+                    <div class="window-controls">
+                        <span class="minimize">_</span>
+                        <span class="maximize">□</span>
+                        <span class="close">×</span>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="settings-container">
+                        <h2>Personalización</h2>
+                        <div class="settings-section">
+                            <h3>Tema del sistema</h3>
+                            <p>Selecciona el aspecto visual:</p>
+                            <div class="theme-options">
+                                <div class="theme-option" data-theme="windows">
+                                    <div class="theme-preview ys-preview"></div>
+                                    <div class="theme-info">
+                                        <h4>You-Space</h4>
+                                        <button class="theme-select-btn" data-theme="windows">Seleccionar</button>
+                                    </div>
+                                </div>
+                                <div class="theme-option" data-theme="macos">
+                                    <div class="theme-preview macos-preview"></div>
+                                    <div class="theme-info">
+                                        <h4>macOS</h4>
+                                        <button class="theme-select-btn" data-theme="macos">Seleccionar</button>
+                                    </div>
+                                </div>
+                                <div class="theme-option" data-theme="linux">
+                                    <div class="theme-preview linux-preview"></div>
+                                    <div class="theme-info">
+                                        <h4>Linux</h4>
+                                        <button class="theme-select-btn" data-theme="linux">Seleccionar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </header>
 
-    <!-- Hero Section -->
-    <main class="main-content">
-        <section class="hero">
-            <h1 class="hero-title">
-                Tu Espacio de Herramientas <span class="hero-accent">Tecnológicas e IA</span>
-            </h1>
-            <p class="hero-description">
-                Descubre y potencia tu creatividad con las últimas herramientas de inteligencia artificial, software, hardware y recursos educativos en un solo lugar.
-            </p>
-            <button class="cta-button">Explorar Ahora &gt;</button>
-        </section>
-
-        <!-- Grid de tarjetas -->
-        <section class="cards-grid">
-            <a href="#" class="card" data-category="Generación de Video e IA">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 8C15 8 8 15 8 24C8 33 15 40 24 40" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 8C33 8 40 15 40 24C40 33 33 40 24 40" stroke="currentColor" stroke-width="2"/>
-                        <polygon points="24,18 30,30 18,30" fill="currentColor"/>
-                    </svg>
+        <div class="taskbar">
+            <div class="start-menu">
+                <button class="start-button">You-Space</button>
+                <div class="start-menu-content">
+                    <div class="start-menu-header">You-Space</div>
+                    <div class="start-menu-items">
+                        <div class="start-menu-item" data-window="file-explorer">
+                            <img src="icons/folder.png" alt="Archivos">
+                            <span>Archivos</span>
+                        </div>
+                        <div class="start-menu-item" data-window="browser">
+                            <img src="icons/browser.png" alt="Navegador">
+                            <span>Navegador</span>
+                        </div>
+                        <div class="start-menu-item" data-window="notepad">
+                            <img src="icons/notepad.png" alt="Bloc de notas">
+                            <span>Bloc de notas</span>
+                        </div>
+                        <div class="start-menu-item" data-window="calculator">
+                            <img src="icons/calculator.png" alt="Calculadora">
+                            <span>Calculadora</span>
+                        </div>
+                        <div class="start-menu-item" data-window="word">
+                            <img src="icons/office/word.png" alt="Word">
+                            <span>Word</span>
+                        </div>
+                        <div class="start-menu-item" data-window="excel">
+                            <img src="icons/office/excel.png" alt="Excel">
+                            <span>Excel</span>
+                        </div>
+                        <div class="start-menu-item" data-window="powerpoint">
+                            <img src="icons/office/powerpoint.png" alt="PowerPoint">
+                            <span>PowerPoint</span>
+                        </div>
+                        <div class="start-menu-item" data-window="settings">
+                            <img src="icons/settings.png" alt="Configuración">
+                            <span>Configuración</span>
+                        </div>
+                    </div>
                 </div>
-                <span class="card-title">Generación de Video e IA</span>
-            </a>
-            <a href="#" class="card" data-category="Chatbots">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 20C12 16 16 12 24 12C32 12 36 16 36 20V28C36 32 32 36 24 36C16 36 12 32 12 28V20Z" stroke="currentColor" stroke-width="2"/>
-                        <circle cx="24" cy="24" r="4" stroke="currentColor" stroke-width="2"/>
-                        <path d="M28 28L36 36" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Chatbots</span>
-            </a>
-            <a href="#" class="card" data-category="Cursos">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 12L24 36M12 24L36 24" stroke="currentColor" stroke-width="2"/>
-                        <rect x="10" y="10" width="28" height="28" rx="2" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Cursos</span>
-            </a>
-            <a href="#" class="card" data-category="Tips para PC">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="8" y="8" width="32" height="24" rx="2" stroke="currentColor" stroke-width="2"/>
-                        <path d="M8 32H40" stroke="currentColor" stroke-width="2"/>
-                        <circle cx="24" cy="22" r="3" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Tips para PC</span>
-            </a>
-            <a href="#" class="card" data-category="Impresoras 3D">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="12" y="8" width="24" height="28" rx="2" stroke="currentColor" stroke-width="2"/>
-                        <path d="M12 20H36" stroke="currentColor" stroke-width="2"/>
-                        <rect x="18" y="26" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Impresoras 3D</span>
-            </a>
-            <a href="#" class="card" data-category="Herramientas de Reparación">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 14L28 14L28 34L20 34" stroke="currentColor" stroke-width="2"/>
-                        <path d="M14 20L34 20L34 28L14 28" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Herramientas de Reparación</span>
-            </a>
-            <a href="#" class="card" data-category="Presentaciones y Datos">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 36V18L24 12L36 18V36" stroke="currentColor" stroke-width="2"/>
-                        <path d="M12 36H36" stroke="currentColor" stroke-width="2"/>
-                        <rect x="18" y="24" width="6" height="12" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 24V12" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Presentaciones y Datos</span>
-            </a>
-            <a href="#" class="card" data-category="Crear Páginas Web">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 14L20 20M20 14L14 20" stroke="currentColor" stroke-width="2"/>
-                        <path d="M28 28L34 34M34 28L28 34" stroke="currentColor" stroke-width="2"/>
-                        <rect x="8" y="8" width="32" height="32" rx="2" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Crear Páginas Web</span>
-            </a>
-            <a href="#" class="card" data-category="Ofertas y Viajes">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 8L28 20L40 24L28 28L24 40L20 28L8 24L20 20L24 8Z" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Ofertas y Viajes</span>
-            </a>
-            <a href="#" class="card" data-category="Imagen 3D">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 8L8 24L24 40L40 24L24 8Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 8V40M8 24H40" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Imagen 3D</span>
-            </a>
-            <a href="#" class="card" data-category="Audio y Edición">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 12V24L30 30" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 36C30 36 36 30 36 24C36 18 30 12 24 12C18 12 12 18 12 24C12 30 18 36 24 36Z" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Audio y Edición</span>
-            </a>
-            <a href="#" class="card" data-category="Diseño Gráfico">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="24" cy="24" r="8" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 12V8M24 40V36M12 24H8M40 24H36" stroke="currentColor" stroke-width="2"/>
-                        <path d="M18 18L14 14M34 34L30 30M34 14L30 18M18 30L14 34" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Diseño Gráfico</span>
-            </a>
-            <a href="#" class="card" data-category="Programación e IA">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="8" y="14" width="32" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
-                        <path d="M14 24H34M14 28H28" stroke="currentColor" stroke-width="2"/>
-                        <path d="M20 34H28" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Programación e IA</span>
-            </a>
-            <a href="#" class="card" data-category="Seguridad Digital">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 8L8 16V32L24 40L40 32V16L24 8Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 8V40M8 16L40 32M40 16L8 32" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Seguridad Digital</span>
-            </a>
-            <a href="#" class="card" data-category="Recursos de IA">
-                <div class="card-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 12C18 12 14 16 14 22C14 28 18 32 24 32" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 8C30 8 34 12 34 18C34 24 30 28 24 28" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 4C36 4 40 10 40 20C40 30 34 36 24 36" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <span class="card-title">Recursos de IA</span>
-            </a>
-        </section>
-    </main>
-
-    <!-- Modal próximamente -->
-    <div class="modal-overlay" id="modal-overlay">
-        <div class="modal">
-            <h3 class="modal-title">Próximamente</h3>
-            <p class="modal-text" id="modal-text">Esta sección estará disponible pronto.</p>
-            <button class="modal-close" id="modal-close">Cerrar</button>
+            </div>
+            <div class="taskbar-items"></div>
+            <div class="system-tray">
+                <span class="time">12:00</span>
+            </div>
         </div>
     </div>
 
