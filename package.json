@@ -1,0 +1,29 @@
+{
+  "name": "you-space2",
+  "version": "1.0.0",
+  "description": "[![Netlify Status](https://api.netlify.com/api/v1/badges/c098635d-e53d-4b87-8ee6-e629599bae08/deploy-status)](https://app.netlify.com/sites/you-space/deploys)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jojetaz/you-space2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jojetaz/you-space2/issues"
+  },
+  "homepage": "https://github.com/jojetaz/you-space2#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mercadopago": "^2.12.0",
+    "sqlite3": "^6.0.1"
+  }
+}

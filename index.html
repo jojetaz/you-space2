@@ -20,13 +20,12 @@
         </a>
         <nav class="nav-links">
             <a href="#" data-nav="inicio">Inicio</a>
-            <a href="#" data-nav="herramientas">Herramientas</a>
-            <a href="#" data-nav="cursos">Cursos</a>
-            <a href="#" data-nav="ofertas">Ofertas</a>
             <a href="#" data-nav="comunidad">Comunidad</a>
             <a href="#" data-nav="contacto">Contacto</a>
+            <a href="#" data-nav="suscripcion">Suscripción</a>
         </nav>
         <div class="header-actions">
+            <button class="user-access-btn" id="user-access-btn">Acceso: Invitado</button>
             <button class="search-btn" aria-label="Buscar">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
@@ -198,13 +197,27 @@
                 </div>
                 <span class="card-title">Recursos de IA</span>
             </a>
+            <a href="#" class="card vip-card" data-category="Herramientas Exclusivas VIP">
+                <div class="card-icon">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 8L30 18L42 20L34 30L36 42L24 36L12 42L14 30L6 20L18 18L24 8Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <span class="card-title">Herramientas Exclusivas VIP</span>
+            </a>
         </section>
 
         <!-- Panel de herramientas guardadas -->
         <section class="tools-panel" id="tools-panel">
             <div class="tools-panel-header">
-                <h2 class="tools-panel-title">Herramientas guardadas</h2>
-                <button class="tools-back-btn" id="tools-back">← Volver</button>
+                <div>
+                    <h2 class="tools-panel-title">Herramientas guardadas</h2>
+                    <p class="tools-panel-category" id="tools-panel-category">Categoría activa: General</p>
+                </div>
+                <div class="tools-panel-actions">
+                    <button class="tool-btn tool-btn-add hidden" id="tools-add-btn">+ Agregar</button>
+                    <button class="tools-back-btn" id="tools-back">← Volver</button>
+                </div>
             </div>
             <div class="tools-table-wrapper">
                 <table class="tools-table">
@@ -224,6 +237,27 @@
                 </table>
             </div>
         </section>
+
+        <section class="community-panel" id="community-panel">
+            <div class="tools-panel-header">
+                <div>
+                    <h2 class="tools-panel-title">Comunidad</h2>
+                    <p class="tools-panel-category">Foro abierto para comentarios de la comunidad.</p>
+                </div>
+                <div class="tools-panel-actions">
+                    <button class="tools-back-btn" id="community-back">← Volver</button>
+                </div>
+            </div>
+            <div class="forum-card">
+                <form id="forum-form" class="forum-form">
+                    <textarea id="forum-input" rows="3" placeholder="Comparte una recomendación, duda o aporte..." required></textarea>
+                    <div class="forum-form-actions">
+                        <button type="submit" class="modal-close">Publicar</button>
+                    </div>
+                </form>
+                <div id="forum-list" class="forum-list"></div>
+            </div>
+        </section>
     </main>
 
     <!-- Modal próximamente -->
@@ -232,6 +266,121 @@
             <h3 class="modal-title">Próximamente</h3>
             <p class="modal-text" id="modal-text">Esta sección estará disponible pronto.</p>
             <button class="modal-close" id="modal-close">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de herramienta (agregar/editar) -->
+    <div class="modal-overlay" id="tool-form-overlay">
+        <div class="modal tool-form-modal">
+            <h3 class="modal-title" id="tool-form-title">Nueva herramienta</h3>
+            <form id="tool-form" class="tool-form">
+                <label class="tool-form-label">
+                    Categoría
+                    <select id="tool-categoria" required></select>
+                </label>
+                <label class="tool-form-label">
+                    Nombre
+                    <input id="tool-nombre" type="text" required />
+                </label>
+                <label class="tool-form-label">
+                    Descripción
+                    <textarea id="tool-descripcion" rows="3" required></textarea>
+                </label>
+                <label class="tool-form-label">
+                    URL principal
+                    <input id="tool-url" type="url" placeholder="https://..." required />
+                </label>
+                <label class="tool-form-label">
+                    URL de video (opcional)
+                    <input id="tool-video-url" type="url" placeholder="https://..." />
+                </label>
+                <label class="tool-form-label">
+                    Fecha de creación
+                    <input id="tool-fecha" type="text" placeholder="dd/mm/yyyy" required />
+                </label>
+                <div class="tool-form-actions">
+                    <button type="button" class="tools-back-btn" id="tool-form-cancel">Cancelar</button>
+                    <button type="submit" class="modal-close">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="auth-overlay">
+        <div class="modal tool-form-modal">
+            <h3 class="modal-title" id="auth-title">Acceso de usuarios</h3>
+            <form id="auth-form" class="tool-form">
+                <label class="tool-form-label">
+                    Modo
+                    <select id="auth-mode" required>
+                        <option value="login">Iniciar sesión</option>
+                        <option value="register">Crear usuario</option>
+                    </select>
+                </label>
+                <label class="tool-form-label">
+                    Usuario
+                    <input id="auth-username" type="text" required />
+                </label>
+                <label class="tool-form-label">
+                    Contraseña
+                    <input id="auth-password" type="password" required />
+                </label>
+                <label class="tool-form-label" id="auth-plan-wrapper">
+                    Tipo de cuenta
+                    <select id="auth-plan">
+                        <option value="free">Gratis</option>
+                        <option value="vip">VIP (suscripción)</option>
+                    </select>
+                </label>
+                <p class="auth-error hidden" id="auth-error"></p>
+                <div class="tool-form-actions">
+                    <button type="button" class="tools-back-btn" id="auth-cancel">Cancelar</button>
+                    <button type="button" class="tool-btn tool-btn-delete" id="auth-logout-btn">Cerrar sesión</button>
+                    <button type="submit" class="modal-close">Continuar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="subscription-overlay">
+        <div class="modal tool-form-modal">
+            <h3 class="modal-title">Herramientas Exclusivas VIP</h3>
+            <p class="modal-text" id="subscription-text">
+                Activa VIP para desbloquear herramientas premium. Puedes pagar con Mercado Pago, Stripe o PayPal.
+            </p>
+            <div class="subscription-billing-toggle" id="subscription-billing-toggle">
+                <button type="button" class="subscription-billing-btn active" data-plan="vip-monthly">Mensual</button>
+                <button type="button" class="subscription-billing-btn" data-plan="vip-yearly">Anual</button>
+            </div>
+            <div class="subscription-dynamic-saving" id="subscription-dynamic-saving">
+                <span class="subscription-dynamic-label">Ahorro anual</span>
+                <strong id="subscription-saving-value">0%</strong>
+                <small id="subscription-saving-note">Selecciona plan anual para ver ahorro estimado.</small>
+            </div>
+            <div class="subscription-plans" id="subscription-plans">
+                <button type="button" class="subscription-plan active" data-plan="vip-monthly">
+                    <span class="subscription-plan-name">Plan Mensual</span>
+                    <strong class="subscription-plan-price">$9.99 USD</strong>
+                    <small>Pago cada mes</small>
+                </button>
+                <button type="button" class="subscription-plan" data-plan="vip-yearly">
+                    <span class="subscription-plan-badge">Recomendado</span>
+                    <span class="subscription-plan-badge subscription-plan-badge-sold">Más vendido</span>
+                    <span class="subscription-plan-name">Plan Anual</span>
+                    <strong class="subscription-plan-price">$89.99 USD</strong>
+                    <small>Equivale a $7.50 USD/mes</small>
+                    <small class="subscription-plan-saving">Ahorra 25% ($29.89 USD/año)</small>
+                </button>
+            </div>
+            <div class="subscription-methods">
+                <button type="button" class="tool-btn tool-btn-visitar" id="subscription-mercadopago-btn">Pagar con Mercado Pago</button>
+                <button type="button" class="tool-btn tool-btn-video" id="subscription-stripe-btn">Pagar con Stripe</button>
+                <button type="button" class="tool-btn tool-btn-video" id="subscription-paypal-btn">Pagar con PayPal</button>
+            </div>
+            <div class="tool-form-actions">
+                <button type="button" class="tools-back-btn" id="subscription-close">Más tarde</button>
+                <button type="button" class="modal-close" id="subscription-activate-info">La activación VIP se realiza tras confirmar el pago</button>
+            </div>
         </div>
     </div>
 

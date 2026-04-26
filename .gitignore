@@ -1,2 +1,6 @@
 core
 *.core
+node_modules
+.env
+data/*.db
+data/*.db-*

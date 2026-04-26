@@ -1,6 +1,6 @@
 # Desplegar You-Space en Render
 
-Guía paso a paso para desplegar el sitio estático You-Space en [Render](https://render.com).
+Guía paso a paso para desplegar You-Space como servicio web Node.js en [Render](https://render.com).
 
 ## Requisitos previos
 
@@ -34,18 +34,19 @@ git branch -M main
 git push -u origin main
 ```
 
-### 2. Crear el sitio estático en Render
+### 2. Crear el servicio web en Render
 
 1. Entra en el [Dashboard de Render](https://dashboard.render.com/)
-2. Haz clic en **New** → **Static Site**
+2. Haz clic en **New** → **Web Service**
 3. Conecta tu repositorio (GitHub/GitLab/Bitbucket)
 4. Selecciona el repositorio **you-space**
 5. Configura:
    - **Name**: `you-space` (o el nombre que prefieras)
    - **Branch**: `main` (o la rama donde esté tu código)
-   - **Build Command**: *(dejar vacío)*
-   - **Publish Directory**: `.` (punto = directorio raíz)
-6. Haz clic en **Create Static Site**
+   - **Runtime**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+6. Haz clic en **Create Web Service**
 
 ### 3. ¡Listo!
 
@@ -68,6 +69,25 @@ Si quieres usar el archivo `render.yaml` incluido en el proyecto:
 
 ---
 
+## Variables de entorno necesarias
+
+Configura estas variables en **Render → Service → Environment**:
+
+- `JWT_SECRET` (Render puede generarla automáticamente)
+- `APP_BASE_URL` (ejemplo: `https://miespacio.blog`)
+- `MP_ACCESS_TOKEN` (token privado de Mercado Pago)
+- `STRIPE_CHECKOUT_MONTHLY_URL` (enlace mensual de Stripe)
+- `STRIPE_CHECKOUT_YEARLY_URL` (enlace anual de Stripe)
+- `PAYPAL_CHECKOUT_MONTHLY_URL` (enlace mensual de PayPal)
+- `PAYPAL_CHECKOUT_YEARLY_URL` (enlace anual de PayPal)
+
+Notas:
+
+- Si no configuras Stripe/PayPal, esos botones mostrarán error de configuración.
+- VIP se activa automáticamente cuando el proveedor confirma el pago.
+
+---
+
 ## Dominio propio
 
 Para usar tu propio dominio:
@@ -75,7 +95,9 @@ Para usar tu propio dominio:
 1. Ve a tu sitio en el Dashboard de Render
 2. **Settings** → **Custom Domains**
 3. Añade tu dominio
-4. Configura los registros DNS según las instrucciones de Render (generalmente un CNAME apuntando a tu URL de Render)
+4. Configura los registros DNS según las instrucciones de Render
+   - Dominio raíz: `A` -> `216.24.57.1`
+   - `www`: `CNAME` -> `you-space.onrender.com` (o tu subdominio real de Render)
 
 ---
 
