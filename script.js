@@ -577,11 +577,34 @@ document.addEventListener('DOMContentLoaded', function() {
         initTheme();
         renderAccessUI();
         showHome();
-        const paymentStatus = new URLSearchParams(window.location.search).get('payment');
+        const searchParams = new URLSearchParams(window.location.search);
+        const paymentStatus = searchParams.get('payment');
+        const paymentId = searchParams.get('payment_id') || searchParams.get('collection_id');
         if (paymentStatus === 'success') {
             await restoreSession();
             renderAccessUI();
-            showInfoModal('Pago recibido', 'Si Mercado Pago confirmó el pago, tu plan VIP quedará activo en unos segundos.');
+            if (authToken && paymentId) {
+                try {
+                    const confirmation = await apiRequest('/api/subscription/confirm-payment', {
+                        method: 'POST',
+                        body: JSON.stringify({ paymentId })
+                    });
+                    if (confirmation?.user) {
+                        activeUser = confirmation.user;
+                        saveAuthState({ token: authToken, user: activeUser });
+                        renderAccessUI();
+                    }
+                    if (confirmation?.paymentStatus === 'approved') {
+                        showInfoModal('Pago aprobado', 'Tu plan VIP fue activado correctamente.');
+                    } else {
+                        showInfoModal('Pago recibido', 'El pago fue recibido y está en validación. VIP se activará cuando Mercado Pago lo confirme.');
+                    }
+                } catch (_error) {
+                    showInfoModal('Pago recibido', 'Recibimos el retorno del pago. Si VIP no se activa en unos minutos, vuelve a iniciar sesión.');
+                }
+            } else {
+                showInfoModal('Pago recibido', 'Si Mercado Pago confirmó el pago, tu plan VIP quedará activo en unos segundos.');
+            }
             window.history.replaceState({}, '', window.location.pathname);
         } else if (paymentStatus === 'pending') {
             showInfoModal('Pago pendiente', 'Tu pago está pendiente de confirmación. Te avisaremos cuando se active VIP.');

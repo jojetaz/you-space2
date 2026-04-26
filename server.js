@@ -420,6 +420,56 @@ app.post('/api/subscription/webhook/mercadopago', async (req, res) => {
     }
 });
 
+app.post('/api/subscription/confirm-payment', authRequired, async (req, res) => {
+    try {
+        if (!mpClient) {
+            return res.status(500).json({ error: 'Mercado Pago no está configurado. Define MP_ACCESS_TOKEN en el servidor.' });
+        }
+        const rawPaymentId = req.body.paymentId || req.body.collectionId;
+        const paymentId = String(rawPaymentId || '').trim();
+        if (!paymentId) {
+            return res.status(400).json({ error: 'paymentId es obligatorio para confirmar el pago.' });
+        }
+
+        const paymentClient = new Payment(mpClient);
+        const payment = await paymentClient.get({ id: paymentId });
+        const externalReference = payment.external_reference;
+        if (!externalReference) {
+            return res.status(400).json({ error: 'El pago no incluye referencia externa.' });
+        }
+
+        const record = await get('SELECT * FROM subscription_payments WHERE external_reference = ?', [externalReference]);
+        if (!record || Number(record.user_id) !== Number(req.user.id)) {
+            return res.status(403).json({ error: 'Este pago no corresponde al usuario autenticado.' });
+        }
+
+        const paymentStatus = payment.status || 'unknown';
+        await run(
+            `UPDATE subscription_payments
+             SET status = ?, payment_id = ?, raw_payload = ?, updated_at = CURRENT_TIMESTAMP
+             WHERE external_reference = ?`,
+            [paymentStatus, String(payment.id || paymentId), JSON.stringify(payment), externalReference]
+        );
+
+        if (paymentStatus === 'approved') {
+            await run(
+                `UPDATE user_profiles
+                 SET plan = 'vip', vip_status = 'active'
+                 WHERE user_id = ?`,
+                [req.user.id]
+            );
+        }
+
+        const refreshed = await getUserWithProfileById(req.user.id);
+        return res.json({
+            paymentStatus,
+            user: serializeUser(refreshed)
+        });
+    } catch (error) {
+        return res.status(500).json({ error: 'No se pudo confirmar el pago con Mercado Pago.' });
+    }
+});
+
 app.get('/api/categories', async (req, res) => {
     try {
         const user = await attachUserFromToken(req);
