@@ -13,6 +13,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'cambia-este-secreto-en-produccion'
 const VIP_CATEGORY = 'Herramientas Exclusivas VIP';
 const APP_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
 const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN || '';
+const IMPORT_LEGACY_SECRET = process.env.IMPORT_LEGACY_SECRET || '';
+const LEGACY_BASE_URL = process.env.LEGACY_BASE_URL || 'https://you-space-app-1.onrender.com';
 const STRIPE_CHECKOUT_MONTHLY_URL = process.env.STRIPE_CHECKOUT_MONTHLY_URL || '';
 const STRIPE_CHECKOUT_YEARLY_URL = process.env.STRIPE_CHECKOUT_YEARLY_URL || '';
 const PAYPAL_CHECKOUT_MONTHLY_URL = process.env.PAYPAL_CHECKOUT_MONTHLY_URL || '';
@@ -64,6 +66,112 @@ const defaultTools = [
     { categoria: 'Generación de Video e IA', nombre: 'seaart.ia', descripcion: 'Generación de videos e imagen sin censura', url: 'https://seaart.ai', videoUrl: '', fecha: '10/07/2025', accessLevel: 'free' },
     { categoria: VIP_CATEGORY, nombre: 'Novedades VIP', descripcion: 'Contenido premium para usuarios con suscripción activa.', url: 'https://example.com/vip', videoUrl: '', fecha: '25/04/2026', accessLevel: 'vip' }
 ];
+
+const legacyCategoryMap = {
+    'Generacion de video e imagen': 'Generación de Video e IA',
+    'Generación de Imágenes': 'Diseño Gráfico',
+    'Tips impresoras 3d': 'Impresoras 3D',
+    'herramientas de reparacion': 'Herramientas de Reparación',
+    'Presentaciones y analisis de datos': 'Presentaciones y Datos',
+    'Crear paginas web y app': 'Crear Páginas Web',
+    negocios: 'Ofertas y Viajes',
+    'Generar imagen 3D': 'Imagen 3D',
+    'Audio y musica': 'Audio y Edición',
+    'Herramientas de busqueda': 'Recursos de IA',
+    'Herramientas utiles variadas': 'Recursos de IA',
+    'Renderizar y optimizar planos': 'Diseño Gráfico'
+};
+
+function normalizeLegacyCategory(name) {
+    return legacyCategoryMap[name] || name;
+}
+
+function cleanLegacyHtml(text) {
+    return String(text || '')
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function parseLegacyCategoryPage(html) {
+    const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/is);
+    const category = titleMatch ? cleanLegacyHtml(titleMatch[1]) : '';
+    if (!category || category.toLowerCase().includes('portafolio')) return null;
+
+    const rows = [];
+    const tableRows = html.match(/<tr>[\s\S]*?<\/tr>/gi) || [];
+    for (const rowHtml of tableRows) {
+        const cols = rowHtml.match(/<td[^>]*>[\s\S]*?<\/td>/gi) || [];
+        if (cols.length < 5) continue;
+
+        const nombre = cleanLegacyHtml(cols[0]);
+        const descripcion = cleanLegacyHtml(cols[1]);
+        const urlMatch = cols[2].match(/href=["']([^"']+)["']/i);
+        const videoMatch = cols[3].match(/href=["']([^"']+)["']/i);
+        const fecha = cleanLegacyHtml(cols[4]);
+        if (!nombre || !urlMatch) continue;
+
+        rows.push({
+            categoria: normalizeLegacyCategory(category),
+            nombre,
+            descripcion: descripcion || 'Sin descripción',
+            url: urlMatch[1],
+            videoUrl: videoMatch ? videoMatch[1] : '',
+            fecha: fecha || new Date().toLocaleDateString('es-CL')
+        });
+    }
+    return rows;
+}
+
+async function importLegacyTools() {
+    const homeRes = await fetch(`${LEGACY_BASE_URL}/`);
+    if (!homeRes.ok) {
+        throw new Error(`No se pudo leer home legacy (${homeRes.status})`);
+    }
+    const homeHtml = await homeRes.text();
+    const ids = Array.from(
+        new Set((homeHtml.match(/\/categoria\/\d+/g) || []).map((m) => Number(m.split('/').pop())))
+    )
+        .filter((id) => Number.isInteger(id))
+        .sort((a, b) => a - b);
+
+    let fetchedCategories = 0;
+    let totalRows = 0;
+    let inserted = 0;
+    let skipped = 0;
+    const insertedByCategory = {};
+
+    for (const id of ids) {
+        const res = await fetch(`${LEGACY_BASE_URL}/categoria/${id}`);
+        if (!res.ok) continue;
+        const html = await res.text();
+        const rows = parseLegacyCategoryPage(html);
+        if (!rows || rows.length === 0) continue;
+
+        fetchedCategories += 1;
+        totalRows += rows.length;
+
+        for (const tool of rows) {
+            const existing = await get(
+                'SELECT id FROM tools WHERE categoria = ? AND nombre = ? AND url = ?',
+                [tool.categoria, tool.nombre, tool.url]
+            );
+            if (existing) {
+                skipped += 1;
+                continue;
+            }
+            await run(
+                'INSERT INTO tools (categoria, nombre, descripcion, url, video_url, fecha, access_level) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [tool.categoria, tool.nombre, tool.descripcion, tool.url, tool.videoUrl, tool.fecha, 'free']
+            );
+            inserted += 1;
+            insertedByCategory[tool.categoria] = (insertedByCategory[tool.categoria] || 0) + 1;
+        }
+    }
+
+    return { fetchedCategories, totalRows, inserted, skipped, insertedByCategory };
+}
 
 async function getUserWithProfileByUsername(username) {
     return get(
@@ -417,6 +525,27 @@ app.post('/api/subscription/webhook/mercadopago', async (req, res) => {
         return res.status(200).send('ok');
     } catch (error) {
         return res.status(200).send('ok');
+    }
+});
+
+app.get('/api/admin/import-legacy-tools', async (req, res) => {
+    try {
+        if (!IMPORT_LEGACY_SECRET) {
+            return res.status(500).json({ error: 'IMPORT_LEGACY_SECRET no está configurado en el servidor.' });
+        }
+        const key = String(req.query.key || '');
+        if (!key || key !== IMPORT_LEGACY_SECRET) {
+            return res.status(401).json({ error: 'No autorizado para importar herramientas legacy.' });
+        }
+
+        const summary = await importLegacyTools();
+        return res.json({
+            ok: true,
+            legacyBaseUrl: LEGACY_BASE_URL,
+            ...summary
+        });
+    } catch (error) {
+        return res.status(500).json({ error: error.message || 'No se pudo importar herramientas legacy.' });
     }
 });
 

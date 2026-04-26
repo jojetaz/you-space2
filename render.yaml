@@ -12,6 +12,10 @@ services:
         value: https://you-space.onrender.com
       - key: MP_ACCESS_TOKEN
         sync: false
+      - key: IMPORT_LEGACY_SECRET
+        sync: false
+      - key: LEGACY_BASE_URL
+        value: https://you-space-app-1.onrender.com
       - key: STRIPE_CHECKOUT_MONTHLY_URL
         sync: false
       - key: STRIPE_CHECKOUT_YEARLY_URL
