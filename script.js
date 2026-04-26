@@ -311,6 +311,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const payload = mode.value === 'register'
                     ? await apiRequest('/api/auth/register', { method: 'POST', body: JSON.stringify({ username, password, plan }) })
                     : await apiRequest('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+                if (!payload || !payload.token || !payload.user) {
+                    throw new Error('Respuesta inválida del servidor al iniciar sesión. Intenta nuevamente en unos segundos.');
+                }
                 authToken = payload.token;
                 activeUser = payload.user;
                 saveAuthState({ token: authToken, user: activeUser });
