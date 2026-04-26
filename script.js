@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
         async function startCheckout(provider, providerName) {
             try {
                 if (!authToken) {
-                    showInfoModal('Suscripción VIP', 'Primero crea una cuenta o inicia sesión para continuar al pago.');
+                    close();
                     openAuthModal();
                     return;
                 }
@@ -428,11 +428,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 const checkoutUrl = payload.checkoutUrl || payload.sandboxCheckoutUrl;
                 if (!checkoutUrl) {
+                    close();
                     showInfoModal('Pagos', `No se pudo generar el enlace de pago para ${providerName}. Revisa la configuración del servidor.`);
                     return;
                 }
                 window.location.href = checkoutUrl;
             } catch (error) {
+                close();
                 showInfoModal('Pagos', error.message || `No se pudo iniciar el checkout de ${providerName}.`);
             }
         }
@@ -444,6 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return startCheckout('paypal', 'PayPal');
         }
         function onActivateInfo() {
+            close();
             showInfoModal('Activación VIP', 'El acceso VIP se activa automáticamente cuando el proveedor de pago confirma la transacción.');
         }
 
