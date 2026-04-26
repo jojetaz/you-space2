@@ -15,6 +15,7 @@ const APP_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
 const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN || '';
 const IMPORT_LEGACY_SECRET = process.env.IMPORT_LEGACY_SECRET || '';
 const LEGACY_BASE_URL = process.env.LEGACY_BASE_URL || 'https://you-space-app-1.onrender.com';
+const LEGACY_CATEGORY_IDS = process.env.LEGACY_CATEGORY_IDS || '';
 const STRIPE_CHECKOUT_MONTHLY_URL = process.env.STRIPE_CHECKOUT_MONTHLY_URL || '';
 const STRIPE_CHECKOUT_YEARLY_URL = process.env.STRIPE_CHECKOUT_YEARLY_URL || '';
 const PAYPAL_CHECKOUT_MONTHLY_URL = process.env.PAYPAL_CHECKOUT_MONTHLY_URL || '';
@@ -125,16 +126,41 @@ function parseLegacyCategoryPage(html) {
 }
 
 async function importLegacyTools() {
-    const homeRes = await fetch(`${LEGACY_BASE_URL}/`);
-    if (!homeRes.ok) {
-        throw new Error(`No se pudo leer home legacy (${homeRes.status})`);
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    async function fetchWithRetry(url, attempts = 5) {
+        let lastStatus = 0;
+        for (let i = 0; i < attempts; i += 1) {
+            const res = await fetch(url);
+            if (res.ok) return res;
+            lastStatus = res.status;
+            if (res.status === 429 || res.status >= 500) {
+                await wait(800 * (i + 1));
+                continue;
+            }
+            return res;
+        }
+        throw new Error(`No se pudo leer recurso legacy (${lastStatus || 'sin respuesta'})`);
     }
-    const homeHtml = await homeRes.text();
-    const ids = Array.from(
-        new Set((homeHtml.match(/\/categoria\/\d+/g) || []).map((m) => Number(m.split('/').pop())))
-    )
-        .filter((id) => Number.isInteger(id))
-        .sort((a, b) => a - b);
+
+    let ids = [];
+    if (LEGACY_CATEGORY_IDS.trim()) {
+        ids = Array.from(
+            new Set(
+                LEGACY_CATEGORY_IDS.split(',')
+                    .map((v) => Number(v.trim()))
+                    .filter((n) => Number.isInteger(n) && n > 0)
+            )
+        ).sort((a, b) => a - b);
+    } else {
+        const homeRes = await fetchWithRetry(`${LEGACY_BASE_URL}/`);
+        const homeHtml = await homeRes.text();
+        ids = Array.from(
+            new Set((homeHtml.match(/\/categoria\/\d+/g) || []).map((m) => Number(m.split('/').pop())))
+        )
+            .filter((id) => Number.isInteger(id))
+            .sort((a, b) => a - b);
+    }
+    if (ids.length === 0) throw new Error('No se detectaron categorías legacy para importar.');
 
     let fetchedCategories = 0;
     let totalRows = 0;
@@ -143,7 +169,7 @@ async function importLegacyTools() {
     const insertedByCategory = {};
 
     for (const id of ids) {
-        const res = await fetch(`${LEGACY_BASE_URL}/categoria/${id}`);
+        const res = await fetchWithRetry(`${LEGACY_BASE_URL}/categoria/${id}`);
         if (!res.ok) continue;
         const html = await res.text();
         const rows = parseLegacyCategoryPage(html);
@@ -168,9 +194,10 @@ async function importLegacyTools() {
             inserted += 1;
             insertedByCategory[tool.categoria] = (insertedByCategory[tool.categoria] || 0) + 1;
         }
+        await wait(250);
     }
 
-    return { fetchedCategories, totalRows, inserted, skipped, insertedByCategory };
+    return { fetchedCategories, totalRows, inserted, skipped, insertedByCategory, ids };
 }
 
 async function getUserWithProfileByUsername(username) {

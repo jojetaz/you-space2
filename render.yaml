@@ -16,6 +16,8 @@ services:
         sync: false
       - key: LEGACY_BASE_URL
         value: https://you-space-app-1.onrender.com
+      - key: LEGACY_CATEGORY_IDS
+        sync: false
       - key: STRIPE_CHECKOUT_MONTHLY_URL
         sync: false
       - key: STRIPE_CHECKOUT_YEARLY_URL
