@@ -21,10 +21,12 @@ const STRIPE_CHECKOUT_YEARLY_URL = process.env.STRIPE_CHECKOUT_YEARLY_URL || '';
 const PAYPAL_CHECKOUT_MONTHLY_URL = process.env.PAYPAL_CHECKOUT_MONTHLY_URL || '';
 const PAYPAL_CHECKOUT_YEARLY_URL = process.env.PAYPAL_CHECKOUT_YEARLY_URL || '';
 
-const DB_DIR = path.join(__dirname, 'data');
-const DB_PATH = path.join(DB_DIR, 'you-space.db');
+// En Render (plan Free), el disco del contenedor es efímero: cada deploy borra ./data.
+// Monta un Persistent Disk y define DATA_DIR al punto de montaje (ej. /var/data).
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const DB_PATH = process.env.DB_PATH || path.join(DATA_DIR, 'you-space.db');
 
-if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 const db = new sqlite3.Database(DB_PATH);
 const mpClient = MP_ACCESS_TOKEN ? new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN }) : null;
 
