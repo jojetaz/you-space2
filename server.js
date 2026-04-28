@@ -433,6 +433,81 @@ app.get('/api/auth/me', authRequired, async (req, res) => {
     res.json(serializeUser(req.user));
 });
 
+app.get('/api/admin/users', authRequired, adminRequired, async (req, res) => {
+    try {
+        const rows = await all(
+            `SELECT u.id, u.username, u.role, u.created_at AS created_at,
+                    COALESCE(p.plan, 'free') AS plan,
+                    COALESCE(p.vip_status, 'none') AS vip_status
+             FROM users u
+             LEFT JOIN user_profiles p ON p.user_id = u.id
+             ORDER BY u.id ASC`
+        );
+        res.json(
+            rows.map((row) => ({
+                id: String(row.id),
+                username: row.username,
+                role: row.role,
+                plan: row.plan,
+                vipStatus: row.vip_status,
+                createdAt: row.created_at
+            }))
+        );
+    } catch (error) {
+        res.status(500).json({ error: 'No se pudieron listar usuarios' });
+    }
+});
+
+app.patch('/api/admin/account', authRequired, adminRequired, async (req, res) => {
+    try {
+        const currentPassword = String(req.body.currentPassword || '');
+        const rawNewUsername = req.body.newUsername !== undefined ? String(req.body.newUsername).trim().toLowerCase() : '';
+        const newPassword = req.body.newPassword !== undefined ? String(req.body.newPassword) : '';
+
+        if (!currentPassword) {
+            return res.status(400).json({ error: 'La contraseña actual es obligatoria.' });
+        }
+        if (!rawNewUsername && !newPassword) {
+            return res.status(400).json({ error: 'Indica un nuevo usuario o una nueva contraseña.' });
+        }
+
+        const userRow = await get('SELECT id, username, password_hash, role FROM users WHERE id = ?', [req.user.id]);
+        if (!userRow) return res.status(404).json({ error: 'Usuario no encontrado' });
+        const valid = await bcrypt.compare(currentPassword, userRow.password_hash);
+        if (!valid) return res.status(401).json({ error: 'Contraseña actual incorrecta.' });
+
+        let nextUsername = userRow.username;
+        if (rawNewUsername) {
+            if (rawNewUsername.length < 3) {
+                return res.status(400).json({ error: 'El nuevo usuario debe tener al menos 3 caracteres.' });
+            }
+            const taken = await get('SELECT id FROM users WHERE username = ? AND id != ?', [rawNewUsername, req.user.id]);
+            if (taken) return res.status(409).json({ error: 'Ese nombre de usuario ya está en uso.' });
+            nextUsername = rawNewUsername;
+        }
+
+        let nextHash = userRow.password_hash;
+        if (newPassword) {
+            if (newPassword.length < 10) {
+                return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 10 caracteres.' });
+            }
+            nextHash = await bcrypt.hash(newPassword, 10);
+        }
+
+        await run('UPDATE users SET username = ?, password_hash = ? WHERE id = ?', [nextUsername, nextHash, req.user.id]);
+
+        if (nextUsername !== userRow.username) {
+            await run('UPDATE forum_comments SET username = ? WHERE user_id = ?', [nextUsername, req.user.id]);
+        }
+
+        const refreshed = await getUserWithProfileById(req.user.id);
+        const token = signToken(refreshed);
+        res.json({ token, user: serializeUser(refreshed) });
+    } catch (error) {
+        res.status(500).json({ error: 'No se pudo actualizar la cuenta de administrador.' });
+    }
+});
+
 app.get('/api/subscription/options', (req, res) => {
     res.json({
         title: 'Herramientas Exclusivas VIP',

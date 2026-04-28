@@ -23,6 +23,7 @@
             <a href="#" data-nav="comunidad">Comunidad</a>
             <a href="#" data-nav="contacto">Contacto</a>
             <a href="#" data-nav="suscripcion">Suscripción</a>
+            <a href="#" class="hidden" id="nav-admin" data-nav="admin">Admin</a>
         </nav>
         <div class="header-actions">
             <button class="user-access-btn" id="user-access-btn">Acceso: Invitado</button>
@@ -256,6 +257,63 @@
                     </div>
                 </form>
                 <div id="forum-list" class="forum-list"></div>
+            </div>
+        </section>
+
+        <section class="community-panel" id="admin-panel">
+            <div class="tools-panel-header">
+                <div>
+                    <h2 class="tools-panel-title">Panel de administración</h2>
+                    <p class="tools-panel-category">Usuarios registrados y seguridad de tu cuenta.</p>
+                </div>
+                <div class="tools-panel-actions">
+                    <button class="tools-back-btn" id="admin-back">← Volver</button>
+                </div>
+            </div>
+            <div class="admin-layout">
+                <div class="forum-card admin-users-card">
+                    <h3 class="admin-subtitle">Usuarios registrados</h3>
+                    <div class="tools-table-wrapper">
+                        <table class="tools-table admin-users-table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Plan</th>
+                                    <th>VIP</th>
+                                    <th>Registro</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="forum-card admin-security-card">
+                    <h3 class="admin-subtitle">Seguridad del administrador</h3>
+                    <p class="admin-security-hint">Sustituye el usuario <strong>admin</strong> y la contraseña por defecto. Usa una contraseña larga y única (mínimo 10 caracteres).</p>
+                    <form id="admin-account-form" class="tool-form">
+                        <label class="tool-form-label">
+                            Contraseña actual
+                            <input id="admin-current-password" type="password" required autocomplete="current-password" />
+                        </label>
+                        <label class="tool-form-label">
+                            Nuevo usuario (opcional)
+                            <input id="admin-new-username" type="text" autocomplete="username" placeholder="mínimo 3 caracteres" />
+                        </label>
+                        <label class="tool-form-label">
+                            Nueva contraseña (opcional)
+                            <input id="admin-new-password" type="password" autocomplete="new-password" placeholder="mínimo 10 caracteres si cambias" />
+                        </label>
+                        <label class="tool-form-label">
+                            Repetir nueva contraseña
+                            <input id="admin-new-password2" type="password" autocomplete="new-password" />
+                        </label>
+                        <p class="auth-error hidden" id="admin-account-error"></p>
+                        <div class="tool-form-actions">
+                            <button type="submit" class="modal-close">Guardar cambios</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </section>
     </main>

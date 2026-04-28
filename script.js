@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('cards-section')?.classList.add('hidden');
         document.getElementById('tools-panel')?.classList.remove('active');
         document.getElementById('community-panel')?.classList.remove('active');
+        document.getElementById('admin-panel')?.classList.remove('active');
     }
 
     function showHome() {
@@ -99,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('cards-section')?.classList.remove('hidden');
         document.getElementById('tools-panel')?.classList.remove('active');
         document.getElementById('community-panel')?.classList.remove('active');
+        document.getElementById('admin-panel')?.classList.remove('active');
     }
 
     async function showToolsPanel() {
@@ -116,6 +118,41 @@ document.addEventListener('DOMContentLoaded', function() {
         await loadForumComments();
     }
 
+    async function loadAdminUsers() {
+        const tbody = document.getElementById('admin-users-tbody');
+        if (!tbody) return;
+        try {
+            const users = await apiRequest('/api/admin/users');
+            if (!users.length) {
+                tbody.innerHTML = '<tr><td colspan="5">No hay usuarios registrados.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map((u) => `
+                <tr>
+                    <td><strong>${escapeHtml(u.username)}</strong></td>
+                    <td>${escapeHtml(u.role)}</td>
+                    <td>${escapeHtml(u.plan)}</td>
+                    <td>${escapeHtml(u.vipStatus)}</td>
+                    <td>${escapeHtml(u.createdAt || '—')}</td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="5">${escapeHtml(error.message)}</td></tr>`;
+        }
+    }
+
+    async function showAdminPanel() {
+        if (!authToken || !isAdmin()) {
+            showInfoModal('Administración', 'Inicia sesión con una cuenta de administrador para ver este panel.');
+            openAuthModal();
+            return;
+        }
+        currentPanel = 'admin';
+        closeAllPanels();
+        document.getElementById('admin-panel')?.classList.add('active');
+        await loadAdminUsers();
+    }
+
     function renderAccessUI() {
         const accessBtn = document.getElementById('user-access-btn');
         const addBtn = document.getElementById('tools-add-btn');
@@ -124,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
             accessBtn.textContent = `Acceso: ${activeUser.username} (${activeUser.role} - ${tier})`;
         }
         if (addBtn) addBtn.classList.toggle('hidden', !isAdmin());
+        document.getElementById('nav-admin')?.classList.toggle('hidden', !isAdmin());
     }
 
     function renderToolsTable(list, customMessage) {
@@ -490,7 +528,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('tools-back')?.addEventListener('click', showHome);
     document.getElementById('community-back')?.addEventListener('click', showHome);
+    document.getElementById('admin-back')?.addEventListener('click', showHome);
     document.getElementById('user-access-btn')?.addEventListener('click', openAuthModal);
+
+    document.getElementById('admin-account-form')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const errEl = document.getElementById('admin-account-error');
+        const currentPassword = document.getElementById('admin-current-password').value;
+        const newUsername = document.getElementById('admin-new-username').value.trim().toLowerCase();
+        const newPassword = document.getElementById('admin-new-password').value;
+        const newPassword2 = document.getElementById('admin-new-password2').value;
+        if (errEl) {
+            errEl.textContent = '';
+            errEl.classList.add('hidden');
+        }
+        if (!newUsername && !newPassword) {
+            if (errEl) {
+                errEl.textContent = 'Indica un nuevo usuario o una nueva contraseña.';
+                errEl.classList.remove('hidden');
+            }
+            return;
+        }
+        if (newPassword && newPassword !== newPassword2) {
+            if (errEl) {
+                errEl.textContent = 'Las contraseñas nuevas no coinciden.';
+                errEl.classList.remove('hidden');
+            }
+            return;
+        }
+        try {
+            const payload = {
+                currentPassword,
+                ...(newUsername ? { newUsername } : {}),
+                ...(newPassword ? { newPassword } : {})
+            };
+            const res = await apiRequest('/api/admin/account', { method: 'PATCH', body: JSON.stringify(payload) });
+            authToken = res.token;
+            activeUser = res.user;
+            saveAuthState({ token: authToken, user: activeUser });
+            renderAccessUI();
+            document.getElementById('admin-current-password').value = '';
+            document.getElementById('admin-new-username').value = '';
+            document.getElementById('admin-new-password').value = '';
+            document.getElementById('admin-new-password2').value = '';
+            await loadAdminUsers();
+            showInfoModal('Cuenta actualizada', 'Tus datos de administrador se guardaron. Si cambiaste la contraseña, ya puedes usarla en el próximo inicio de sesión.');
+        } catch (error) {
+            if (errEl) {
+                errEl.textContent = error.message || 'No se pudo guardar.';
+                errEl.classList.remove('hidden');
+            }
+        }
+    });
 
     document.querySelectorAll('.card').forEach((card) => {
         card.addEventListener('click', async (e) => {
@@ -506,6 +595,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const nav = link.getAttribute('data-nav');
             if (nav === 'inicio') return showHome();
             if (nav === 'comunidad') return showCommunityPanel();
+            if (nav === 'admin') return showAdminPanel();
             if (nav === 'contacto') {
                 showInfoModal('Contacto', 'Puedes crear un usuario gratis o VIP y participar en la comunidad. Próximamente añadiremos soporte directo.');
                 return;

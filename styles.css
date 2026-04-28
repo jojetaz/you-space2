@@ -411,6 +411,36 @@ body::after {
     display: block;
 }
 
+.admin-layout {
+    display: grid;
+    gap: 1.5rem;
+}
+
+@media (min-width: 960px) {
+    .admin-layout {
+        grid-template-columns: 1fr 400px;
+        align-items: start;
+    }
+}
+
+.admin-subtitle {
+    color: var(--accent-cyan);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.admin-security-hint {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.admin-users-table {
+    font-size: 0.88rem;
+}
+
 .tools-panel-header {
     display: flex;
     justify-content: space-between;
