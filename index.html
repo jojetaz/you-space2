@@ -314,6 +314,31 @@
                         </div>
                     </form>
                 </div>
+                <div class="forum-card admin-users-card">
+                    <h3 class="admin-subtitle">Gestión de categorías</h3>
+                    <div class="tools-table-wrapper">
+                        <table class="tools-table admin-users-table">
+                            <thead>
+                                <tr>
+                                    <th>Categoría</th>
+                                    <th>Acceso</th>
+                                    <th>Herramientas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-categories-tbody"></tbody>
+                        </table>
+                    </div>
+                    <form id="admin-category-create-form" class="tool-form" style="margin-top: 1rem;">
+                        <label class="tool-form-label">
+                            Nueva categoría
+                            <input id="admin-category-new-name" type="text" placeholder="Ej: Productividad IA" required />
+                        </label>
+                        <div class="tool-form-actions">
+                            <button type="submit" class="modal-close">Crear categoría</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </section>
     </main>

@@ -132,13 +132,112 @@ body::after {
 }
 
 @media (max-width: 900px) {
-    .nav-links {
-        display: none;
-    }
-    
     .header {
-        padding: 1rem 1.5rem;
+        padding: 0.85rem 1rem;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "logo actions"
+            "nav nav";
+        row-gap: 0.75rem;
+        align-items: center;
     }
+
+    .logo {
+        grid-area: logo;
+        font-size: 1.1rem;
+        min-width: 0;
+    }
+
+    .header-actions {
+        grid-area: actions;
+        justify-self: end;
+        gap: 0.45rem;
+        max-width: 100%;
+    }
+
+    .user-access-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        border-radius: 999px;
+        font-size: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .user-access-btn::before {
+        content: '👤';
+        font-size: 1.05rem;
+        line-height: 1;
+    }
+
+    .search-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .search-btn svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .theme-toggle {
+        gap: 0.3rem;
+    }
+
+    .theme-icon {
+        font-size: 0.95rem;
+    }
+
+    .toggle-switch {
+        width: 40px;
+        height: 22px;
+    }
+
+    .toggle-knob {
+        width: 16px;
+        height: 16px;
+    }
+
+    .toggle-knob.active {
+        transform: translateX(18px);
+    }
+
+    .nav-links {
+        grid-area: nav;
+        display: flex;
+        gap: 0.55rem;
+        overflow-x: auto;
+        padding-bottom: 0.2rem;
+        scrollbar-width: thin;
+    }
+
+    .nav-links a {
+        flex: 0 0 auto;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        font-size: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 194, 255, 0.24);
+        background: rgba(0, 194, 255, 0.07);
+    }
+
+    .nav-links a::before {
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .nav-links a[data-nav='inicio']::before { content: '🏠'; }
+    .nav-links a[data-nav='comunidad']::before { content: '👥'; }
+    .nav-links a[data-nav='contacto']::before { content: '✉️'; }
+    .nav-links a[data-nav='suscripcion']::before { content: '💳'; }
+    .nav-links a[data-nav='admin']::before { content: '🛠️'; }
 }
 
 .nav-links a {
@@ -373,6 +472,12 @@ body::after {
 .card-icon svg {
     width: 100%;
     height: 100%;
+}
+
+.card-emoji {
+    font-size: 2rem;
+    line-height: 1;
+    display: inline-block;
 }
 
 .card-title {
@@ -912,5 +1017,90 @@ body::after {
     }
     100% {
         box-shadow: 0 0 0 2px rgba(0, 194, 255, 0.2), 0 0 14px rgba(0, 194, 255, 0.1);
+    }
+}
+
+@media (max-width: 700px) {
+    .main-content {
+        padding: 1rem 0.85rem 2rem;
+    }
+
+    .hero {
+        margin-bottom: 2.2rem;
+        max-width: 100%;
+    }
+
+    .hero-title {
+        font-size: clamp(1.8rem, 9vw, 2.3rem);
+        margin-bottom: 0.85rem;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+        line-height: 1.55;
+        margin-bottom: 1.25rem;
+    }
+
+    .cta-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+    }
+
+    .card {
+        min-height: 112px;
+        padding: 1.1rem 0.9rem;
+        border-radius: 14px;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+    }
+
+    .card-icon {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Refuerzo final para iconos móviles (evita que reglas base muestren texto) */
+@media (max-width: 900px) {
+    .header .user-access-btn {
+        width: 38px !important;
+        height: 38px !important;
+        padding: 0 !important;
+        font-size: 0 !important;
+        line-height: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-indent: -9999px !important;
+    }
+
+    .header .user-access-btn::before {
+        content: '👤';
+        font-size: 1.05rem;
+        line-height: 1;
+        text-indent: 0;
+    }
+
+    .header .nav-links a {
+        width: 38px !important;
+        height: 38px !important;
+        padding: 0 !important;
+        font-size: 0 !important;
+        line-height: 0 !important;
+        text-indent: -9999px !important;
+        overflow: hidden !important;
+    }
+
+    .header .nav-links a::before {
+        font-size: 1rem;
+        line-height: 1;
+        text-indent: 0;
     }
 }

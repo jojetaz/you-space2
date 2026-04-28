@@ -20,6 +20,24 @@ const STRIPE_CHECKOUT_MONTHLY_URL = process.env.STRIPE_CHECKOUT_MONTHLY_URL || '
 const STRIPE_CHECKOUT_YEARLY_URL = process.env.STRIPE_CHECKOUT_YEARLY_URL || '';
 const PAYPAL_CHECKOUT_MONTHLY_URL = process.env.PAYPAL_CHECKOUT_MONTHLY_URL || '';
 const PAYPAL_CHECKOUT_YEARLY_URL = process.env.PAYPAL_CHECKOUT_YEARLY_URL || '';
+const DEFAULT_CATEGORIES = [
+    'Generación de Video e IA',
+    'Chatbots',
+    'Cursos',
+    'Tips para PC',
+    'Impresoras 3D',
+    'Herramientas de Reparación',
+    'Presentaciones y Datos',
+    'Crear Páginas Web',
+    'Ofertas y Viajes',
+    'Imagen 3D',
+    'Audio y Edición',
+    'Diseño Gráfico',
+    'Programación e IA',
+    'Seguridad Digital',
+    'Recursos de IA',
+    VIP_CATEGORY
+];
 
 // En Render (plan Free), el disco del contenedor es efímero: cada deploy borra ./data.
 // Monta un Persistent Disk y define DATA_DIR al punto de montaje (ej. /var/data).
@@ -60,6 +78,27 @@ function all(sql, params = []) {
 async function tableHasColumn(tableName, columnName) {
     const columns = await all(`PRAGMA table_info(${tableName})`);
     return columns.some((c) => c.name === columnName);
+}
+
+async function ensureCategoryExists(name, accessLevel = 'free') {
+    const normalizedName = String(name || '').trim();
+    if (!normalizedName) return;
+    const finalAccess = accessLevel === 'vip' || normalizedName === VIP_CATEGORY ? 'vip' : 'free';
+    const existing = await get('SELECT id FROM categories WHERE name = ?', [normalizedName]);
+    if (!existing) {
+        await run('INSERT INTO categories (name, access_level) VALUES (?, ?)', [normalizedName, finalAccess]);
+        return;
+    }
+    await run(
+        `UPDATE categories
+         SET access_level = CASE
+             WHEN access_level = 'vip' THEN 'vip'
+             WHEN ? = 'vip' THEN 'vip'
+             ELSE access_level
+         END
+         WHERE name = ?`,
+        [finalAccess, normalizedName]
+    );
 }
 
 const defaultTools = [
@@ -193,6 +232,7 @@ async function importLegacyTools() {
                 'INSERT INTO tools (categoria, nombre, descripcion, url, video_url, fecha, access_level) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 [tool.categoria, tool.nombre, tool.descripcion, tool.url, tool.videoUrl, tool.fecha, 'free']
             );
+            await ensureCategoryExists(tool.categoria, 'free');
             inserted += 1;
             insertedByCategory[tool.categoria] = (insertedByCategory[tool.categoria] || 0) + 1;
         }
@@ -277,6 +317,15 @@ async function initializeDatabase() {
     }
 
     await run(`
+        CREATE TABLE IF NOT EXISTS categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            access_level TEXT NOT NULL DEFAULT 'free' CHECK (access_level IN ('free', 'vip')),
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    await run(`
         CREATE TABLE IF NOT EXISTS forum_comments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -335,6 +384,14 @@ async function initializeDatabase() {
                 [tool.categoria, tool.nombre, tool.descripcion, tool.url, tool.videoUrl, tool.fecha, tool.accessLevel]
             );
         }
+    }
+
+    for (const categoryName of DEFAULT_CATEGORIES) {
+        await ensureCategoryExists(categoryName, categoryName === VIP_CATEGORY ? 'vip' : 'free');
+    }
+    const toolCategories = await all('SELECT DISTINCT categoria, access_level FROM tools');
+    for (const c of toolCategories) {
+        await ensureCategoryExists(c.categoria, c.access_level);
     }
 }
 
@@ -455,6 +512,89 @@ app.get('/api/admin/users', authRequired, adminRequired, async (req, res) => {
         );
     } catch (error) {
         res.status(500).json({ error: 'No se pudieron listar usuarios' });
+    }
+});
+
+app.get('/api/admin/categories', authRequired, adminRequired, async (req, res) => {
+    try {
+        const rows = await all(
+            `SELECT c.name, c.access_level, c.created_at,
+                    COUNT(t.id) AS tools_count
+             FROM categories c
+             LEFT JOIN tools t ON t.categoria = c.name
+             GROUP BY c.id
+             ORDER BY c.name ASC`
+        );
+        res.json(
+            rows.map((row) => ({
+                name: row.name,
+                accessLevel: row.access_level,
+                toolsCount: Number(row.tools_count || 0),
+                createdAt: row.created_at
+            }))
+        );
+    } catch (error) {
+        res.status(500).json({ error: 'No se pudieron listar categorías' });
+    }
+});
+
+app.post('/api/admin/categories', authRequired, adminRequired, async (req, res) => {
+    try {
+        const name = String(req.body.name || '').trim();
+        const accessLevel = req.body.accessLevel === 'vip' || name === VIP_CATEGORY ? 'vip' : 'free';
+        if (name.length < 3) return res.status(400).json({ error: 'El nombre de categoría debe tener al menos 3 caracteres.' });
+        await ensureCategoryExists(name, accessLevel);
+        const created = await get('SELECT name, access_level, created_at FROM categories WHERE name = ?', [name]);
+        return res.status(201).json({
+            name: created.name,
+            accessLevel: created.access_level,
+            createdAt: created.created_at
+        });
+    } catch (error) {
+        return res.status(500).json({ error: 'No se pudo crear la categoría.' });
+    }
+});
+
+app.patch('/api/admin/categories', authRequired, adminRequired, async (req, res) => {
+    try {
+        const oldName = String(req.body.oldName || '').trim();
+        const newName = String(req.body.newName || '').trim();
+        if (!oldName || !newName) return res.status(400).json({ error: 'oldName y newName son obligatorios.' });
+        if (oldName === VIP_CATEGORY || newName === VIP_CATEGORY) {
+            return res.status(400).json({ error: 'La categoría VIP no se puede renombrar.' });
+        }
+        const source = await get('SELECT id FROM categories WHERE name = ?', [oldName]);
+        if (!source) return res.status(404).json({ error: 'Categoría origen no encontrada.' });
+        const target = await get('SELECT id FROM categories WHERE name = ?', [newName]);
+        if (target) return res.status(409).json({ error: 'Ya existe una categoría con ese nombre.' });
+        await run('UPDATE categories SET name = ? WHERE name = ?', [newName, oldName]);
+        await run('UPDATE tools SET categoria = ? WHERE categoria = ?', [newName, oldName]);
+        return res.json({ ok: true });
+    } catch (error) {
+        return res.status(500).json({ error: 'No se pudo renombrar la categoría.' });
+    }
+});
+
+app.delete('/api/admin/categories', authRequired, adminRequired, async (req, res) => {
+    try {
+        const name = String(req.body.name || '').trim();
+        const replacementCategory = String(req.body.replacementCategory || '').trim();
+        if (!name) return res.status(400).json({ error: 'name es obligatorio.' });
+        if (name === VIP_CATEGORY) return res.status(400).json({ error: 'La categoría VIP no se puede eliminar.' });
+        const source = await get('SELECT id FROM categories WHERE name = ?', [name]);
+        if (!source) return res.status(404).json({ error: 'Categoría no encontrada.' });
+
+        if (replacementCategory) {
+            const target = await get('SELECT id FROM categories WHERE name = ?', [replacementCategory]);
+            if (!target) return res.status(404).json({ error: 'Categoría destino no encontrada.' });
+            await run('UPDATE tools SET categoria = ? WHERE categoria = ?', [replacementCategory, name]);
+        } else {
+            await run('DELETE FROM tools WHERE categoria = ?', [name]);
+        }
+        await run('DELETE FROM categories WHERE name = ?', [name]);
+        return res.json({ ok: true });
+    } catch (error) {
+        return res.status(500).json({ error: 'No se pudo eliminar la categoría.' });
     }
 });
 
@@ -707,10 +847,10 @@ app.get('/api/categories', async (req, res) => {
     try {
         const user = await attachUserFromToken(req);
         const vipActive = isVipActive(user);
-        const rows = await all('SELECT DISTINCT categoria, access_level FROM tools ORDER BY categoria ASC');
+        const rows = await all('SELECT name, access_level FROM categories ORDER BY name ASC');
         const categories = rows
             .filter((r) => vipActive || r.access_level !== 'vip')
-            .map((r) => r.categoria);
+            .map((r) => r.name);
         if (!categories.includes(VIP_CATEGORY)) categories.push(VIP_CATEGORY);
         res.json(categories);
     } catch (error) {
@@ -754,6 +894,7 @@ app.post('/api/tools', authRequired, adminRequired, async (req, res) => {
             return res.status(400).json({ error: 'Faltan campos obligatorios' });
         }
         const finalAccess = categoria === VIP_CATEGORY ? 'vip' : (accessLevel === 'vip' ? 'vip' : 'free');
+        await ensureCategoryExists(categoria, finalAccess);
         const result = await run(
             'INSERT INTO tools (categoria, nombre, descripcion, url, video_url, fecha, access_level) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [categoria, nombre, descripcion, url, videoUrl || '', fecha, finalAccess]
@@ -773,6 +914,7 @@ app.put('/api/tools/:id', authRequired, adminRequired, async (req, res) => {
             return res.status(400).json({ error: 'Faltan campos obligatorios' });
         }
         const finalAccess = categoria === VIP_CATEGORY ? 'vip' : (accessLevel === 'vip' ? 'vip' : 'free');
+        await ensureCategoryExists(categoria, finalAccess);
         await run(
             'UPDATE tools SET categoria = ?, nombre = ?, descripcion = ?, url = ?, video_url = ?, fecha = ?, access_level = ? WHERE id = ?',
             [categoria, nombre, descripcion, url, videoUrl || '', fecha, finalAccess, id]

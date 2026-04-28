@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const THEME_KEY = 'you-space-theme';
     const INTRO_KEY = 'you-space-intro-seen';
     const VIP_CATEGORY = 'Herramientas Exclusivas VIP';
-    const CATEGORIES = Array.from(document.querySelectorAll('.card')).map((card) => card.getAttribute('data-category'));
+    let CATEGORIES = [];
 
     let authToken = null;
     let activeUser = { username: 'Invitado', role: 'invitado', plan: 'free', vipStatus: 'none', vipActive: false };
@@ -86,6 +86,51 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = '';
     }
 
+    function categoryIcon(name) {
+        const key = String(name || '').toLowerCase();
+        if (key.includes('video')) return '🎬';
+        if (key.includes('chat')) return '💬';
+        if (key.includes('curso')) return '🎓';
+        if (key.includes('pc')) return '💻';
+        if (key.includes('impresora')) return '🖨️';
+        if (key.includes('repar')) return '🛠️';
+        if (key.includes('present')) return '📊';
+        if (key.includes('web')) return '🌐';
+        if (key.includes('viaj') || key.includes('oferta')) return '✈️';
+        if (key.includes('3d')) return '🧊';
+        if (key.includes('audio')) return '🎧';
+        if (key.includes('diseño')) return '🎨';
+        if (key.includes('program')) return '⌨️';
+        if (key.includes('seguridad')) return '🔐';
+        if (key.includes('recurso')) return '🧠';
+        if (key.includes('vip')) return '⭐';
+        return '📁';
+    }
+
+    function renderCategoryCards(categories) {
+        const container = document.getElementById('cards-section');
+        if (!container) return;
+        container.innerHTML = categories.map((category) => `
+            <a href="#" class="card ${category === VIP_CATEGORY ? 'vip-card' : ''}" data-category="${escapeHtml(category)}">
+                <div class="card-icon"><span class="card-emoji">${categoryIcon(category)}</span></div>
+                <span class="card-title">${escapeHtml(category)}</span>
+            </a>
+        `).join('');
+    }
+
+    async function loadCategories() {
+        try {
+            const categories = await apiRequest('/api/categories');
+            CATEGORIES = Array.isArray(categories) ? categories : [];
+            renderCategoryCards(CATEGORIES);
+        } catch (_error) {
+            if (!CATEGORIES.length) {
+                CATEGORIES = [VIP_CATEGORY];
+                renderCategoryCards(CATEGORIES);
+            }
+        }
+    }
+
     function closeAllPanels() {
         document.getElementById('hero-section')?.classList.add('hidden');
         document.getElementById('cards-section')?.classList.add('hidden');
@@ -141,6 +186,75 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    async function loadAdminCategories() {
+        const tbody = document.getElementById('admin-categories-tbody');
+        if (!tbody) return;
+        try {
+            const list = await apiRequest('/api/admin/categories');
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="4">No hay categorías.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = list.map((c) => `
+                <tr>
+                    <td><strong>${escapeHtml(c.name)}</strong></td>
+                    <td>${escapeHtml(c.accessLevel)}</td>
+                    <td>${escapeHtml(String(c.toolsCount || 0))}</td>
+                    <td>
+                        ${c.name === VIP_CATEGORY ? '<span class="tool-no-video">Protegida</span>' : `
+                            <div class="tool-actions">
+                                <button class="tool-btn tool-btn-edit" data-cat-rename="${escapeHtml(c.name)}">Renombrar</button>
+                                <button class="tool-btn tool-btn-delete" data-cat-delete="${escapeHtml(c.name)}">Eliminar</button>
+                            </div>
+                        `}
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.querySelectorAll('[data-cat-rename]').forEach((btn) => btn.addEventListener('click', async function() {
+                const oldName = this.getAttribute('data-cat-rename');
+                const newName = prompt(`Nuevo nombre para "${oldName}"`, oldName);
+                if (!newName || newName.trim() === oldName) return;
+                try {
+                    await apiRequest('/api/admin/categories', {
+                        method: 'PATCH',
+                        body: JSON.stringify({ oldName, newName: newName.trim() })
+                    });
+                    if (activeCategory === oldName) activeCategory = newName.trim();
+                    await loadCategories();
+                    await loadAdminCategories();
+                    if (currentPanel === 'tools') await refreshTools();
+                } catch (error) {
+                    showInfoModal('Categorías', error.message);
+                }
+            }));
+
+            tbody.querySelectorAll('[data-cat-delete]').forEach((btn) => btn.addEventListener('click', async function() {
+                const name = this.getAttribute('data-cat-delete');
+                const replacementCategory = prompt(
+                    `Eliminar "${name}".\nSi quieres mover herramientas, escribe categoría destino.\nSi lo dejas vacío, se borran herramientas de esta categoría.`,
+                    ''
+                );
+                if (replacementCategory === null) return;
+                if (!confirm(`¿Confirmas eliminar la categoría "${name}"?`)) return;
+                try {
+                    await apiRequest('/api/admin/categories', {
+                        method: 'DELETE',
+                        body: JSON.stringify({ name, replacementCategory: replacementCategory.trim() })
+                    });
+                    if (activeCategory === name) activeCategory = 'all';
+                    await loadCategories();
+                    await loadAdminCategories();
+                    if (currentPanel === 'tools') await refreshTools();
+                } catch (error) {
+                    showInfoModal('Categorías', error.message);
+                }
+            }));
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="4">${escapeHtml(error.message)}</td></tr>`;
+        }
+    }
+
     async function showAdminPanel() {
         if (!authToken || !isAdmin()) {
             showInfoModal('Administración', 'Inicia sesión con una cuenta de administrador para ver este panel.');
@@ -151,6 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closeAllPanels();
         document.getElementById('admin-panel')?.classList.add('active');
         await loadAdminUsers();
+        await loadAdminCategories();
     }
 
     function renderAccessUI() {
@@ -159,6 +274,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (accessBtn) {
             const tier = hasVipAccess() ? 'VIP' : (activeUser.plan === 'vip' ? 'VIP pendiente' : 'Gratis');
             accessBtn.textContent = `Acceso: ${activeUser.username} (${activeUser.role} - ${tier})`;
+            accessBtn.setAttribute('aria-label', accessBtn.textContent);
+            accessBtn.title = accessBtn.textContent;
         }
         if (addBtn) addBtn.classList.toggle('hidden', !isAdmin());
         document.getElementById('nav-admin')?.classList.toggle('hidden', !isAdmin());
@@ -244,8 +361,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const cancel = document.getElementById('tool-form-cancel');
 
             document.getElementById('tool-form-title').textContent = current && current.id ? 'Editar herramienta' : 'Nueva herramienta';
-            categoria.innerHTML = CATEGORIES.map((cat) => `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`).join('');
-            categoria.value = current.categoria || (activeCategory === 'all' ? CATEGORIES[0] : activeCategory);
+            const available = CATEGORIES.length ? CATEGORIES : [VIP_CATEGORY];
+            categoria.innerHTML = available.map((cat) => `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`).join('');
+            categoria.value = current.categoria || (activeCategory === 'all' ? available[0] : activeCategory);
             nombre.value = current.nombre || '';
             descripcion.value = current.descripcion || '';
             url.value = current.url || 'https://';
@@ -581,12 +699,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    document.querySelectorAll('.card').forEach((card) => {
-        card.addEventListener('click', async (e) => {
-            e.preventDefault();
-            activeCategory = card.getAttribute('data-category') || 'all';
-            await showToolsPanel();
-        });
+    document.getElementById('admin-category-create-form')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const input = document.getElementById('admin-category-new-name');
+        const name = input.value.trim();
+        if (!name) return;
+        try {
+            await apiRequest('/api/admin/categories', {
+                method: 'POST',
+                body: JSON.stringify({ name })
+            });
+            input.value = '';
+            await loadCategories();
+            await loadAdminCategories();
+        } catch (error) {
+            showInfoModal('Categorías', error.message);
+        }
+    });
+
+    document.getElementById('cards-section')?.addEventListener('click', async (e) => {
+        const card = e.target.closest('.card');
+        if (!card) return;
+        e.preventDefault();
+        activeCategory = card.getAttribute('data-category') || 'all';
+        await showToolsPanel();
     });
 
     document.querySelectorAll('.nav-links a').forEach((link) => {
@@ -634,7 +770,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('tools-add-btn')?.addEventListener('click', async () => {
         if (!isAdmin()) return;
-        const payload = await askToolData({ categoria: activeCategory === 'all' ? CATEGORIES[0] : activeCategory });
+        const defaultCategory = CATEGORIES[0] || VIP_CATEGORY;
+        const payload = await askToolData({ categoria: activeCategory === 'all' ? defaultCategory : activeCategory });
         if (!payload) return;
         try {
             await apiRequest('/api/tools', { method: 'POST', body: JSON.stringify(payload) });
@@ -664,6 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     restoreSession().finally(async function() {
+        await loadCategories();
         initTheme();
         renderAccessUI();
         showHome();
