@@ -3,7 +3,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const THEME_KEY = 'you-space-theme';
     const INTRO_KEY = 'you-space-intro-seen';
     const VIP_CATEGORY = 'Herramientas Exclusivas VIP';
+    const RENDER_API_BASE = 'https://you-space2-prod.onrender.com';
+    const DEFAULT_CATEGORIES = [
+        'Generación de Video e IA',
+        'Chatbots',
+        'Cursos',
+        'Tips para PC',
+        'Impresoras 3D',
+        'Herramientas de Reparación',
+        'Presentaciones y Datos',
+        'Crear Páginas Web',
+        'Ofertas y Viajes',
+        'Imagen 3D',
+        'Audio y Edición',
+        'Diseño Gráfico',
+        'Programación e IA',
+        'Seguridad Digital',
+        'Recursos de IA',
+        VIP_CATEGORY
+    ];
     let CATEGORIES = [];
+    let apiBase = '';
 
     let authToken = null;
     let activeUser = { username: 'Invitado', role: 'invitado', plan: 'free', vipStatus: 'none', vipActive: false };
@@ -47,13 +67,73 @@ document.addEventListener('DOMContentLoaded', function() {
         return isAdmin() || activeUser.vipActive;
     }
 
+    async function fetchWithTimeout(url, options, timeoutMs) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs || 10000);
+        try {
+            return await fetch(url, { ...(options || {}), signal: controller.signal });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    async function pingApi(base) {
+        const response = await fetchWithTimeout(`${base}/api/health`, { cache: 'no-store' }, 5000);
+        if (!response.ok) throw new Error('API no disponible');
+        const data = await response.json();
+        if (!data || data.ok !== true) throw new Error('API no disponible');
+    }
+
+    async function resolveApiBase() {
+        try {
+            await pingApi('');
+            apiBase = '';
+            return apiBase;
+        } catch (_sameOriginError) {
+            try {
+                await pingApi(RENDER_API_BASE);
+                apiBase = RENDER_API_BASE;
+                return apiBase;
+            } catch (_renderError) {
+                apiBase = '';
+                throw new Error('No se pudo conectar con el servidor. Usa https://www.miespacio.blog o https://you-space2-prod.onrender.com');
+            }
+        }
+    }
+
     async function apiRequest(path, options) {
         const config = options || {};
         const headers = { ...(config.headers || {}) };
         if (authToken) headers.Authorization = `Bearer ${authToken}`;
         if (config.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
 
-        const response = await fetch(path, { method: config.method || 'GET', headers, body: config.body });
+        let response;
+        try {
+            response = await fetchWithTimeout(`${apiBase}${path}`, {
+                method: config.method || 'GET',
+                headers,
+                body: config.body,
+                cache: 'no-store'
+            }, 15000);
+        } catch (_networkError) {
+            if (!apiBase) {
+                try {
+                    await pingApi(RENDER_API_BASE);
+                    apiBase = RENDER_API_BASE;
+                    response = await fetchWithTimeout(`${apiBase}${path}`, {
+                        method: config.method || 'GET',
+                        headers,
+                        body: config.body,
+                        cache: 'no-store'
+                    }, 15000);
+                } catch (_retryError) {
+                    throw new Error('Sin conexión con el servidor. Prueba https://you-space2-prod.onrender.com');
+                }
+            } else {
+                throw new Error('Sin conexión con el servidor. Revisa tu red e inténtalo de nuevo.');
+            }
+        }
+
         let data = null;
         if (response.status !== 204) {
             const text = await response.text();
@@ -121,13 +201,12 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadCategories() {
         try {
             const categories = await apiRequest('/api/categories');
-            CATEGORIES = Array.isArray(categories) ? categories : [];
+            CATEGORIES = Array.isArray(categories) ? categories.filter(Boolean) : [];
+            if (!CATEGORIES.length) CATEGORIES = DEFAULT_CATEGORIES.slice();
             renderCategoryCards(CATEGORIES);
         } catch (_error) {
-            if (!CATEGORIES.length) {
-                CATEGORIES = [VIP_CATEGORY];
-                renderCategoryCards(CATEGORIES);
-            }
+            CATEGORIES = DEFAULT_CATEGORIES.slice();
+            renderCategoryCards(CATEGORIES);
         }
     }
 
@@ -800,7 +879,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    restoreSession().finally(async function() {
+    resolveApiBase().catch(() => null).finally(async function() {
+        await restoreSession();
         await loadCategories();
         initTheme();
         renderAccessUI();

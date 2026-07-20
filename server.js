@@ -395,7 +395,11 @@ async function initializeDatabase() {
     }
 }
 
-app.use(cors());
+app.use(cors({
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 function normalizeTool(row) {
@@ -971,7 +975,13 @@ app.post('/api/forum/comments', authRequired, async (req, res) => {
     }
 });
 
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, {
+    setHeaders(res, filePath) {
+        if (/\.(html|js|css)$/i.test(filePath)) {
+            res.setHeader('Cache-Control', 'no-cache');
+        }
+    }
+}));
 app.get('/*splat', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 initializeDatabase()
