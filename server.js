@@ -652,8 +652,8 @@ app.get('/api/subscription/options', (req, res) => {
     res.json({
         title: 'Herramientas Exclusivas VIP',
         plans: [
-            { id: 'vip-monthly', name: 'VIP Mensual', price: '$9.99 USD/mes' },
-            { id: 'vip-yearly', name: 'VIP Anual', price: '$89.99 USD/año' }
+            { id: 'vip-monthly', name: 'VIP Mensual', price: '$4.99 USD/mes' },
+            { id: 'vip-yearly', name: 'VIP Anual', price: '$49.99 USD/año' }
         ],
         methods: ['Mercado Pago', 'Stripe', 'PayPal']
     });
@@ -663,7 +663,7 @@ app.post('/api/subscription/create-checkout', authRequired, async (req, res) => 
     try {
         const provider = req.body.provider === 'stripe' || req.body.provider === 'paypal' ? req.body.provider : 'mercadopago';
         const planId = req.body.planId === 'vip-yearly' ? 'vip-yearly' : 'vip-monthly';
-        const amount = planId === 'vip-yearly' ? 89.99 : 9.99;
+        const amount = planId === 'vip-yearly' ? 49.99 : 4.99;
         const externalReference = `vip_${req.user.id}_${Date.now()}`;
 
         if (provider === 'mercadopago' && !mpClient) {

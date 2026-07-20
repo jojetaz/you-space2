@@ -542,9 +542,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (dynamicSavingCard && dynamicSavingNote) {
                 const isYearly = selectedPlanId === 'vip-yearly';
                 dynamicSavingCard.classList.toggle('yearly', isYearly);
-                animatePercent(isYearly ? 25 : 0);
+                animatePercent(isYearly ? 17 : 0);
                 dynamicSavingNote.textContent = isYearly
-                    ? 'Ahorro aproximado de $29.89 USD frente al pago mensual.'
+                    ? 'Ahorro aproximado de $9.89 USD frente al pago mensual.'
                     : 'Selecciona plan anual para ver ahorro estimado.';
             }
         }
