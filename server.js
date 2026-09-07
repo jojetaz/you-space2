@@ -975,12 +975,12 @@ app.post('/api/forum/comments', authRequired, async (req, res) => {
     }
 });
 
-app.get('/pack', (req, res) => res.redirect(301, '/pack/'));
-app.get('/pack/', (req, res) => {
+app.get(['/pack', '/pack/'], (req, res) => {
     res.sendFile(path.join(__dirname, 'pack', 'index.html'));
 });
 
 app.use(express.static(__dirname, {
+    redirect: false,
     setHeaders(res, filePath) {
         if (/\.(html|js|css)$/i.test(filePath)) {
             res.setHeader('Cache-Control', 'no-cache');
