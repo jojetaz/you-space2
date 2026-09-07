@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pack 7 días — web + bot que cobra reservas | Miespacio</title>
+    <meta
+      name="description"
+      content="En 7 días: web corta, bot que responde horarios y precios, y cobro de reservas por Mercado Pago o transferencia. $450.000 CLP, precio cerrado."
+    />
+    <meta property="og:title" content="Pack 7 días: tu local responde y cobra" />
+    <meta
+      property="og:description"
+      content="Web + bot + cobro de reservas. $450.000 CLP. Si no te sirve en 7 días, no cobro el resto."
+    />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:url" content="https://www.miespacio.blog/pack/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@500;700&family=Fraunces:opsz,wght@9..144,560&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="config-warn" class="config-warn">
+      Falta tu WhatsApp real. Ábrelo en <code>config.js</code> y cambia
+      <code>56912345678</code> por tu número (56 + 9 + 8 dígitos). Hasta entonces
+      el botón no abre una conversación.
+    </div>
+
+    <header class="wrap topbar">
+      <a class="brand" href="#">Miespacio <span>Chile</span></a>
+      <div class="topbar-meta">Pack 7 días · precio cerrado</div>
+    </header>
+
+    <main>
+      <section class="wrap hero">
+        <div>
+          <p class="kicker">Para locales que viven en WhatsApp</p>
+          <h1>En 7 días tu negocio responde y cobra la reserva.</h1>
+          <p class="lede">
+            Te armo una web corta + un bot que contesta horarios y precios + un
+            link para cobrar por Mercado Pago o transferencia. Pensado para
+            gastronomía, estética, inmobiliarias y talleres en Chile.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" data-wa href="#whatsapp-config">
+              Escribir por WhatsApp
+            </a>
+            <a class="btn btn-ghost" href="#incluye">Ver qué incluye</a>
+          </div>
+          <p class="fine">
+            50% al empezar, 50% al entregar. Si no te sirve en 7 días, no cobro
+            el resto.
+          </p>
+        </div>
+
+        <aside class="price-card" aria-label="Precio del pack">
+          <span class="badge">Precio cerrado</span>
+          <div class="amount">
+            <span data-price>$450.000</span>
+            <small>CLP · boleta de honorarios · entrega en 7 días corridos</small>
+          </div>
+          <ul class="price-list">
+            <li><span>Al empezar</span><strong data-adelanto>$225.000</strong></li>
+            <li><span>Al entregar</span><strong data-adelanto>$225.000</strong></li>
+            <li><span>Mantención opcional</span><strong>desde $80.000/mes</strong></li>
+          </ul>
+          <a class="btn btn-primary" data-wa href="#whatsapp-config">Quiero el pack</a>
+        </aside>
+      </section>
+
+      <section class="wrap section" id="incluye">
+        <h2>Tres cosas. Nada de “presencia digital”.</h2>
+        <div class="split">
+          <article class="item">
+            <div class="num">01</div>
+            <h3>Web que se lee en el celular</h3>
+            <p>
+              Horarios, servicios o carta, mapa y botón a WhatsApp. Cinco
+              secciones, no un sitio para impresionar a tu primo.
+            </p>
+          </article>
+          <article class="item">
+            <div class="num">02</div>
+            <h3>Bot que responde lo de siempre</h3>
+            <p>
+              Precio, hora, “¿queda cupo?”. En la web, Telegram o el flujo que
+              usemos con tu WhatsApp. Tú duermes; la consulta no se pierde.
+            </p>
+          </article>
+          <article class="item">
+            <div class="num">03</div>
+            <h3>Cobro de la reserva</h3>
+            <p>
+              Link de Mercado Pago o transferencia. El cliente deja abono y tú
+              dejas de pelear con “te confirmo después”.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="wrap section" id="demos">
+        <h2>Así se ve, sin humo.</h2>
+        <p class="lede">
+          Estos son mockups del pack. Cuando tengas 20 minutos, te grabo el
+          ejemplo real de 40 segundos con tu rubro.
+        </p>
+        <div class="demos">
+          <div class="mock" aria-label="Demo del bot">
+            <div class="chip">Bot · consulta de noche</div>
+            <h3>Centro de estética · 23:41</h3>
+            <div class="bubble in">Hola, ¿tienen hora para mañana en la tarde?</div>
+            <div class="bubble out">
+              Sí. Quedan 16:30 y 18:00. Limpieza facial $28.000. ¿Reservo la de
+              16:30 con abono de $10.000?
+            </div>
+            <div class="bubble in">Dale, 16:30</div>
+          </div>
+          <div class="mock" aria-label="Demo de cobro">
+            <div class="chip">Cobro · Mercado Pago</div>
+            <h3>Reserva estética 16:30</h3>
+            <div class="pay-row"><span>Abono</span><span>$10.000</span></div>
+            <div class="pay-row"><span>Estado</span><span>Pendiente</span></div>
+            <div class="pay-row"><span>Pago</span><span>MP o transferencia</span></div>
+            <p class="fine" style="color: #d9b59f; margin-top: auto">
+              Cuando paga, te llega aviso. Sin App Store.
+            </p>
+          </div>
+          <div class="mock" aria-label="Demo de video corto">
+            <div class="chip">Reel · 40 segundos</div>
+            <h3>El mismo pack, en video</h3>
+            <div class="reel">
+              Antes: WhatsApp lleno y sin cobro.<br />
+              Después: responde y deja abono.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="wrap section" id="plazo">
+        <h2>Los 7 días, sin misterio.</h2>
+        <div class="timeline">
+          <div>
+            <strong>Día 1</strong>
+            <p>20 minutos por WhatsApp. Me pasas textos, fotos y cómo cobras hoy.</p>
+          </div>
+          <div>
+            <strong>Días 2–5</strong>
+            <p>Armo la web, el bot y el link de pago. Te muestro avance, no un PDF.</p>
+          </div>
+          <div>
+            <strong>Días 6–7</strong>
+            <p>Una ronda de ajustes y quedas atendiendo. El resto se paga al entregar.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="wrap section faq" id="faq">
+        <h2>Preguntas que importan para cerrar</h2>
+        <details open>
+          <summary>¿WhatsApp oficial de Meta en 7 días?</summary>
+          <p>
+            La API oficial a veces se demora en verificar. En 7 días entrego
+            algo que funciona: web + cobro + bot en la web o Telegram, y el
+            puente a tu WhatsApp. Si tu número ya está listo para API, lo
+            conectamos. No vendo humo de “ChatGPT en tu WhatsApp Business” si
+            Meta no alcanza a aprobar.
+          </p>
+        </details>
+        <details>
+          <summary>¿Boleta?</summary>
+          <p>
+            Sí. Boleta de honorarios o boleta/factura según cómo estés en el
+            SII. El pago por Mercado Pago no reemplaza el documento.
+          </p>
+        </details>
+        <details>
+          <summary>¿Qué no incluye el $450.000?</summary>
+          <p>
+            Pauta de Instagram/Google, fotos profesionales, tienda con stock, ni
+            la mantención mensual. Eso es extra y se cotiza aparte.
+          </p>
+        </details>
+        <details>
+          <summary>¿Y si no me sirve?</summary>
+          <p>
+            Si en 7 días no tienes web + forma de responder + link para cobrar,
+            no cobro el segundo pago. El adelanto cubre el trabajo ya hecho.
+          </p>
+        </details>
+      </section>
+
+      <section class="cta-band" id="whatsapp-config">
+        <div class="wrap">
+          <h2>Mándame un WhatsApp y te paso el ejemplo de 40 segundos.</h2>
+          <p class="lede" style="color: #d9cbb8">
+            Un mensaje. Sin reunión de 45 minutos. Si no es para ti, te lo digo.
+          </p>
+          <a class="btn btn-primary" data-wa href="#whatsapp-config">Abrir WhatsApp</a>
+          <p class="fine">Miespacio · Chile · cobro en CLP</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap">
+      Miespacio no es una agencia de 8 personas. Es un pack con fecha y precio,
+      para salir a cobrar esta semana.
+    </footer>
+
+    <div class="sticky">
+      <strong><span data-price>$450.000</span> · 7 días</strong>
+      <a class="btn btn-primary" data-wa href="#whatsapp-config">WhatsApp</a>
+    </div>
+
+    <script src="config.js?v=2"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
